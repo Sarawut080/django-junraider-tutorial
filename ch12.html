@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 12 ไฟล์ภาพสแตติก (static images)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class=""><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class=""><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class=""><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class=""><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class=""><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class=""><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class=""><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class=""><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class=""><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class=""><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class=""><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class=""><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class="cur"><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class=""><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class=""><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class=""><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<p class="ch">บทที่ 12 จาก 15</p>
+<h1>ไฟล์ภาพสแตติก (static images)</h1>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider/tree/12-static-images" target="_blank" rel="noopener">บรานช์ 12-static-images</a> · <a href="https://github.com/potchangelo/django-junraider/compare/11-admin...12-static-images" target="_blank" rel="noopener">ส่วนที่เปลี่ยนจากบทก่อนหน้า</a></p>
+<h2>วัตถุประสงค์</h2>
+<p>เมื่อจบบทนี้ ผู้เรียนนำไฟล์ภาพที่เป็นสแตติกไฟล์ (Static Files) เข้าโปรเจกต์ เก็บที่อยู่ภาพของเมนูในฐานข้อมูล และแสดงภาพบนหน้าเว็บด้วยแท็ก <code>static</code> ได้</p>
+<h2>ขั้นตอนที่ 1 ทำความเข้าใจสแตติกไฟล์</h2>
+<p>สแตติกไฟล์ (Static Files) คือไฟล์ที่ Django ส่งให้เบราว์เซอร์ตามที่เก็บไว้โดยไม่ประมวลผล ได้แก่ ภาพ ไฟล์ CSS และไฟล์ JavaScript ตามเอกสารของ Django แอป <code>django.contrib.staticfiles</code> (มีใน <code>INSTALLED_APPS</code> ตั้งแต่บทที่ 1) ค้นหาไฟล์เหล่านี้ในโฟลเดอร์ <code>static</code> ของแต่ละแอป และค่า <code>STATIC_URL = 'static/'</code> ใน <code>settings.py</code> คือส่วนต้นของที่อยู่ที่ใช้เรียกไฟล์ เช่น ไฟล์ <code>app_general/logo.png</code> เรียกที่ <code>/static/app_general/logo.png</code> ระหว่างพัฒนา <code>runserver</code> ส่งไฟล์เหล่านี้ให้โดยอัตโนมัติ</p>
+<p>การตั้งชื่อโฟลเดอร์ใช้หลักเดียวกับเทมเพลตในบทที่ 4 คือ <code>app_ชื่อแอป/static/app_ชื่อแอป/</code> เพื่อไม่ให้ชื่อไฟล์ซ้ำกันข้ามแอป</p>
+<h2>ขั้นตอนที่ 2 นำไฟล์ภาพจาก GitHub เข้าโปรเจกต์</h2>
+<p>ภาพทั้งหมดเตรียมไว้แล้วในรีโพสิตอรี django-junraider บน GitHub ดาวน์โหลดโฟลเดอร์ของบรานช์นี้เป็นไฟล์ ZIP (ไฟล์บีบอัดที่รวมหลายไฟล์ไว้ในไฟล์เดียว) แล้วแตกไฟล์ (Extract)</p>
+<figure class="code"><figcaption><span>ที่อยู่ดาวน์โหลด (เปิดในเบราว์เซอร์)</span><button type="button">คัดลอก</button></figcaption><pre><code>https://github.com/potchangelo/django-junraider/archive/refs/heads/12-static-images.zip</code></pre></figure>
+<p>จากนั้นคัดลอกโฟลเดอร์ 2 โฟลเดอร์ในไฟล์ที่แตกออกมาไปไว้ในโปรเจกต์ โดยคัดลอกทั้งโฟลเดอร์ <code>static</code></p>
+<ul>
+<li>จาก <code>app_foods/static/</code> ไปที่ <code>app_foods/</code> ของโปรเจกต์ (ภาพเมนู 5 ภาพ)</li>
+<li>จาก <code>app_general/static/</code> ไปที่ <code>app_general/</code> ของโปรเจกต์ (ไฟล์ <code>favicon.ico</code>, <code>logo.png</code>, <code>home-about-1.jpg</code>, <code>home-about-2.jpg</code>, <code>home-about-3.jpg</code>, <code>home-bg.jpg</code>)</li>
+</ul>
+<p>ดูรายการไฟล์ในรีโพสิตอรีได้ที่ <a href="https://github.com/potchangelo/django-junraider/tree/12-static-images/app_foods/static/app_foods" target="_blank" rel="noopener">app_foods/static/app_foods</a> และ <a href="https://github.com/potchangelo/django-junraider/tree/12-static-images/app_general/static/app_general" target="_blank" rel="noopener">app_general/static/app_general</a></p>
+<p>ภาพอาหารมาจากเว็บ Unsplash และไอคอน <code>logo.png</code> มาจาก Iconfinder ตามรายการอ้างอิงในหน้า <a href="credits.html">ที่มา (Credits)</a></p>
+<h2>ขั้นตอนที่ 3 เพิ่มฟิลด์เก็บที่อยู่ภาพในโมเดล Food</h2>
+<p>แทนที่เนื้อหาทั้งไฟล์ <code>app_foods/models.py</code> ด้วยโค้ดนี้ (ส่วนที่เปลี่ยนคือเพิ่มฟิลด์ <code>image_relative_url</code> ต่อจากฟิลด์ <code>description</code>)</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/12-static-images/app_foods/models.py" target="_blank" rel="noopener">app_foods/models.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.db import models
+
+# Create your models here.
+
+class Food(models.Model):
+    title = models.CharField(max_length=60)
+    price = models.IntegerField()
+    special_price = models.IntegerField(null=True, blank=True)
+    is_premium = models.BooleanField(default=False)
+    promotion_end_at = models.DateTimeField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    image_relative_url = models.CharField(max_length=50, null=True, blank=True)
+
+    def __str__(self) -&gt; str:
+        return '{} (id: {})'.format(self.title, self.id)</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>image_relative_url = models.CharField(max_length=50, null=True, blank=True)</code></td><td>ฟิลด์ข้อความที่เก็บเส้นทางของไฟล์ภาพเทียบจากโฟลเดอร์ <code>static</code> เช่น <code>app_foods/food-red-spicy.jpg</code> ฐานข้อมูลเก็บเพียงข้อความนี้ ไม่เก็บไฟล์ภาพ</td></tr>
+</tbody></table>
+<p>บันทึกการเปลี่ยนแปลงของโมเดลลงฐานข้อมูลด้วยไมเกรชันเหมือนบทที่ 11 คำสั่งแรกสร้างไฟล์ไมเกรชันที่เพิ่มคอลัมน์ <code>image_relative_url</code> คำสั่งที่สองเพิ่มคอลัมน์นี้ในตาราง <code>app_foods_food</code></p>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py makemigrations
+python manage.py migrate</code></pre></figure>
+<figure class="code out"><figcaption><span>ผลลัพธ์ที่ควรเห็น</span></figcaption><pre><code>Migrations for 'app_foods':
+  app_foods\migrations\0003_food_image_relative_url.py
+    - Add field image_relative_url to food
+
+Operations to perform:
+  Apply all migrations: admin, app_foods, app_general, auth, contenttypes, sessions
+Running migrations:
+  Applying app_foods.0003_food_image_relative_url... OK</code></pre></figure>
+<h2>ขั้นตอนที่ 4 กรอกที่อยู่ภาพของแต่ละเมนูในหน้าผู้ดูแลระบบ</h2>
+<p>เปิด <code>http://127.0.0.1:8000/admin/</code> เข้าไปที่ Foods แล้วแก้ไขเมนูทีละรายการ กรอกช่อง Image relative url ตามตาราง จากนั้นกดปุ่ม บันทึก</p>
+<table class="exp"><thead><tr><th>ชื่อเมนู</th><th>ค่าในช่อง Image relative url</th></tr></thead><tbody>
+<tr><td><code>Red Spicy</code></td><td>app_foods/food-red-spicy.jpg</td></tr>
+<tr><td><code>Blue Glacier</code></td><td>app_foods/food-blue-glacier.jpg</td></tr>
+<tr><td><code>Yellow Sunrise</code></td><td>app_foods/food-yellow-sunrise.jpg</td></tr>
+<tr><td><code>Dark Choco Premium</code></td><td>app_foods/food-dark-choco-premium.jpg</td></tr>
+<tr><td><code>White Choco Premium</code></td><td>app_foods/food-white-choco-premium.jpg</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 5 แสดงภาพในเทมเพลต</h2>
+<p>แทนที่เนื้อหาทั้งไฟล์ของเทมเพลต 6 ไฟล์ด้วยโค้ดต่อไปนี้ เริ่มจากเทมเพลตฐานและส่วนหัว</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/12-static-images/app_general/templates/app_general/components/base.html" target="_blank" rel="noopener">app_general/templates/app_general/components/base.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% load static %}
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;{% block site_title %}{% endblock %}จันทร์ไรเดอร์ เมนูอร่อย ส่งบ่อย ส่งแม่น&lt;/title&gt;
+    &lt;link rel="icon" href="{% static 'app_general/favicon.ico' %}"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    {% include 'app_general/components/site_header.html' %}
+    {% block content %}{% endblock %}
+    {% include 'app_general/components/site_footer.html' %}
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></figure>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/12-static-images/app_general/templates/app_general/components/site_header.html" target="_blank" rel="noopener">app_general/templates/app_general/components/site_header.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% load static %}
+&lt;header class="site-header" style="background-color: lightgray;"&gt;
+    &lt;a class="site-header-item site-header-brand" href="{% url 'home' %}"&gt;
+        &lt;img src="{% static 'app_general/logo.png' %}"&gt;
+        &lt;span&gt;จันทร์ไรเดอร์&lt;/span&gt;
+    &lt;/a&gt;
+    &lt;a class="site-header-item" href="{% url 'foods' %}"&gt;เมนูทั้งหมด&lt;/a&gt;
+    &lt;a class="site-header-item" href="{% url 'about' %}"&gt;เกี่ยวกับ&lt;/a&gt;
+&lt;/header&gt;</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>{% load static %}</code></td><td>โหลดชุดแท็กของสแตติกไฟล์เข้าเทมเพลตนี้ ต้องเขียนก่อนใช้แท็ก <code>static</code> ในทุกไฟล์ที่ใช้ และต้องอยู่หลังแท็ก <code>{% extends %}</code> ในเทมเพลตที่สืบทอด</td></tr>
+<tr><td><code>{% static 'app_general/logo.png' %}</code></td><td>แท็ก <code>static</code> สร้างที่อยู่ของไฟล์จากค่า <code>STATIC_URL</code> ได้ <code>/static/app_general/logo.png</code></td></tr>
+<tr><td><code>&lt;link rel="icon" href="..."&gt;</code></td><td>กำหนดไอคอนของแท็บเบราว์เซอร์ (Favicon)</td></tr>
+<tr><td><code>&lt;img src="..."&gt;</code></td><td>แท็ก HTML แสดงภาพจากที่อยู่ใน <code>src</code></td></tr>
+</tbody></table>
+<p>หน้าแรก</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/12-static-images/app_general/templates/app_general/home.html" target="_blank" rel="noopener">app_general/templates/app_general/home.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+{% load static %}
+
+{% block content %}
+&lt;section&gt;
+    &lt;h1&gt;จันทร์ไรเดอร์&lt;/h1&gt;
+    &lt;p&gt;ไอศครีมอร่อย ส่งบ่อย ส่งแม่น&lt;/p&gt;
+    &lt;p&gt;จัดส่งไอศครีมรสโปรดของคุณ ทุกวันจันทร์แรก จันทร์ที่สอง หรือจันทร์ที่สาม ของแต่ละเดือน&lt;/p&gt;
+&lt;/section&gt;
+&lt;section&gt;
+    &lt;h2&gt;อธิบายอะไรซักหน่อย&lt;/h2&gt;
+    &lt;div&gt;
+        &lt;div&gt;
+            &lt;img src="{% static 'app_general/home-about-1.jpg' %}"&gt;
+        &lt;/div&gt;
+        &lt;p&gt;จันทร์ไรเดอร์ คือ บริการจัดส่งไอศครีมอร่อยถึงมือคุณ เดือนละครั้ง ในวันจันทร์ที่คุณสะดวกรับ&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;div&gt;
+            &lt;img src="{% static 'app_general/home-about-2.jpg' %}"&gt;
+        &lt;/div&gt;
+        &lt;p&gt;จันทร์ไรแมน คือ พนักงานส่งไอศครีม ขี่ไวแบบไม่ย้อนศร และฉีดวัคซีนครบ 2 เข็มแล้วทุกคน&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;div&gt;
+            &lt;img src="{% static 'app_general/home-about-3.jpg' %}"&gt;
+        &lt;/div&gt;
+        &lt;p&gt;ไอศครีมทุกรสรังสรรค์ขึ้นมาอย่างพิถีพิถัน ไม่หวั่นแม้ออเดอร์มามาก&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/section&gt;
+{% endblock %}</code></pre></figure>
+<p>หน้ารายการเมนูและหน้ารายละเอียดเมนู ใช้ค่า <code>food.image_relative_url</code> จากฐานข้อมูลเป็นพารามิเตอร์ของแท็ก <code>static</code></p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/12-static-images/app_foods/templates/app_foods/foods.html" target="_blank" rel="noopener">app_foods/templates/app_foods/foods.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+{% load static %}
+
+{% block site_title %}เมนูอร่อยทั้งหมด - {% endblock %}
+
+{% block content %}
+&lt;h1&gt;เมนูอร่อย ส่งบ่อย ส่งแม่น&lt;/h1&gt;
+{% for food in foods %}
+    &lt;div style="background-color: rgb(255, 238, 231);"&gt;
+        &lt;a href="{% url 'food' food.id %}" style="display: block;"&gt;
+            &lt;img src="{% static food.image_relative_url %}"&gt;
+        &lt;/a&gt;
+        &lt;h3&gt;&lt;a href="{% url 'food' food.id %}"&gt;{{ food.title }}&lt;/a&gt;&lt;/h3&gt;
+        {% if food.special_price is not None %}
+            &lt;p&gt;
+                &lt;del style="color: gray;"&gt;{{ food.price|floatformat:'g' }}&lt;/del&gt;
+                &lt;span&gt;{{ food.special_price|floatformat:'g' }}&lt;/span&gt;
+            &lt;/p&gt;
+        {% else %}
+            &lt;p&gt;{{ food.price|floatformat:'g' }}&lt;/p&gt;
+        {% endif %}
+        {% if food.is_premium %}
+            &lt;p&gt;*** เมนูพิเศษสุด Premium&lt;/p&gt;
+        {% endif %}
+        {% if food.promotion_end_at is not None %}
+            &lt;p&gt;โปรโมชั่นถึงวันที่ {{ food.promotion_end_at|date:'j N Y' }}&lt;/p&gt;
+        {% endif %}
+    &lt;/div&gt;
+{% empty %}
+    &lt;p&gt;วัตถุดิบกำลังเดินทางมาจากทะเลอันไกลโพ้นนนน กรุณารอความอร่อยอีกไม่นาน&lt;/p&gt;
+{% endfor %}
+{% endblock %}</code></pre></figure>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/12-static-images/app_foods/templates/app_foods/food.html" target="_blank" rel="noopener">app_foods/templates/app_foods/food.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+{% load static %}
+
+{% block site_title %}{{ food.title }} - {% endblock %}
+
+{% block content %}
+{% if food is not None %}
+    &lt;div&gt;
+        &lt;img src="{% static food.image_relative_url %}"&gt;
+    &lt;/div&gt;
+    &lt;h1&gt;{{ food.title }}&lt;/h1&gt;
+    {% if food.special_price is not None %}
+        &lt;p&gt;
+            &lt;del style="color: gray;"&gt;{{ food.price|floatformat:'g' }}&lt;/del&gt;
+            &lt;span&gt;{{ food.special_price|floatformat:'g' }}&lt;/span&gt;
+        &lt;/p&gt;
+    {% else %}
+        &lt;p&gt;{{ food.price|floatformat:'g' }}&lt;/p&gt;
+    {% endif %}
+    {% if food.is_premium %}
+        &lt;p&gt;*** เมนูพิเศษสุด Premium&lt;/p&gt;
+    {% endif %}
+    {% if food.promotion_end_at is not None %}
+        &lt;p&gt;โปรโมชั่นถึงวันที่ {{ food.promotion_end_at|date:'j N Y' }}&lt;/p&gt;
+    {% endif %}
+    &lt;p&gt;{{ food.description }}&lt;/p&gt;
+{% else %}
+    &lt;p&gt;ไม่พบเมนู&lt;/p&gt;
+{% endif %}
+{% endblock %}</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>{% static food.image_relative_url %}</code></td><td>พารามิเตอร์ของ <code>static</code> เป็นตัวแปรได้ ไม่จำกัดเฉพาะข้อความ ภาพของแต่ละเมนูจึงต่างกันตามข้อมูลในฐานข้อมูล</td></tr>
+<tr><td><code>&lt;a href="{% url 'food' food.id %}" style="display: block;"&gt;&lt;img ...&gt;&lt;/a&gt;</code></td><td>ทำให้ภาพเป็นลิงก์ไปหน้ารายละเอียดเมนู <code>display: block</code> ทำให้ลิงก์แสดงเต็มความกว้างของบรรทัด</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 6 เปิดเซิร์ฟเวอร์และทดสอบ</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py runserver</code></pre></figure>
+<h2>ผลลัพธ์ที่ควรได้</h2>
+<table class="exp"><thead><tr><th>ที่อยู่</th><th>ผลที่เห็น</th></tr></thead><tbody>
+<tr><td><code>แท็บของเบราว์เซอร์</code></td><td>แสดงไอคอนของเว็บ</td></tr>
+<tr><td><code>ส่วนหัวทุกหน้า</code></td><td>แสดงไอคอนรถจักรยานยนต์ (logo.png) หน้าชื่อ จันทร์ไรเดอร์</td></tr>
+<tr><td><code>http://127.0.0.1:8000/</code></td><td>แสดงภาพ 3 ภาพในส่วน อธิบายอะไรซักหน่อย พร้อมข้อความ</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/</code></td><td>ภาพไอศกรีมของเมนูทั้ง 5 รายการอยู่เหนือชื่อเมนู ภาพมีขนาดใหญ่ตามขนาดไฟล์ เพราะยังไม่ได้จัดรูปแบบ ซึ่งจะทำในบทที่ 13</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/1</code></td><td>ภาพ Red Spicy เหนือชื่อเมนู</td></tr>
+<tr><td><code>http://127.0.0.1:8000/static/app_foods/food-red-spicy.jpg</code></td><td>เบราว์เซอร์แสดงไฟล์ภาพโดยตรง แสดงว่า Django ส่งสแตติกไฟล์ได้ถูกต้อง</td></tr>
+</tbody></table>
+<h2>โครงสร้างไฟล์หลังจบบท</h2>
+<p>แสดงเฉพาะไฟล์ที่เพิ่มหรือแก้ในบทนี้ (+ คือไฟล์ที่สร้างใหม่, * คือไฟล์ที่แก้ไข)</p>
+<figure class="code"><figcaption><span>django-junraider/</span></figcaption><pre><code>django-junraider/
+├── app_foods/
+│   ├── migrations/
+│   │   └── 0003_food_image_relative_url.py        +
+│   ├── models.py                                  *
+│   ├── static/app_foods/
+│   │   ├── food-blue-glacier.jpg                  +
+│   │   ├── food-dark-choco-premium.jpg            +
+│   │   ├── food-red-spicy.jpg                     +
+│   │   ├── food-white-choco-premium.jpg           +
+│   │   └── food-yellow-sunrise.jpg                +
+│   └── templates/app_foods/
+│       ├── food.html                              *
+│       └── foods.html                             *
+└── app_general/
+    ├── static/app_general/
+    │   ├── favicon.ico                            +
+    │   ├── home-about-1.jpg                       +
+    │   ├── home-about-2.jpg                       +
+    │   ├── home-about-3.jpg                       +
+    │   ├── home-bg.jpg                            +
+    │   └── logo.png                               +
+    └── templates/app_general/
+        ├── home.html                              *
+        └── components/
+            ├── base.html                          *
+            └── site_header.html                   *</code></pre></figure>
+<div class="pager"><a href="ch11.html">&larr; บทก่อนหน้า: บทที่ 11</a><a href="ch13.html">บทถัดไป: บทที่ 13 &rarr;</a></div></main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

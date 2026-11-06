@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class=""><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class=""><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class=""><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class=""><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class=""><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class=""><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class=""><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class=""><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class=""><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class=""><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class=""><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class=""><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class=""><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class="cur"><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class=""><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class=""><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<p class="ch">บทที่ 13 จาก 15</p>
+<h1>ไฟล์ CSS และ JavaScript สแตติก</h1>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider/tree/13-static-css-js" target="_blank" rel="noopener">บรานช์ 13-static-css-js</a> · <a href="https://github.com/potchangelo/django-junraider/compare/12-static-images...13-static-css-js" target="_blank" rel="noopener">ส่วนที่เปลี่ยนจากบทก่อนหน้า</a></p>
+<h2>วัตถุประสงค์</h2>
+<p>เมื่อจบบทนี้ ผู้เรียนจัดรูปแบบหน้าเว็บด้วยไฟล์ CSS เพิ่มฟอนต์ภาษาไทย และเพิ่มการตรวจสอบฟอร์มด้วยไฟล์ JavaScript ซึ่งทั้งหมดเป็นสแตติกไฟล์ที่เรียกใช้ผ่านแท็ก <code>static</code> ได้ และปรับเทมเพลตทุกหน้าให้ใช้ชื่อคลาส (Class) ของ CSS</p>
+<h2>ขั้นตอนที่ 1 ทำความเข้าใจ CSS และ JavaScript</h2>
+<ul>
+<li>CSS (Cascading Style Sheets) คือภาษาที่กำหนดรูปแบบการแสดงผลของ HTML เช่น สี ขนาดตัวอักษร และการจัดวาง แต่ละกฎประกอบด้วยซีเล็กเตอร์ (Selector) ที่ระบุว่าใช้กับส่วนใดของหน้า และชุดคุณสมบัติ (Property) ที่ระบุรูปแบบ เช่น <code>h1 { font-size: 32px; }</code> ซีเล็กเตอร์ที่ขึ้นต้นด้วยจุด เช่น <code>.button</code> หมายถึงองค์ประกอบ HTML ที่มี <code>class="button"</code></li>
+<li>JavaScript คือภาษาโปรแกรมที่ทำงานในเบราว์เซอร์ ใช้ทำให้หน้าเว็บตอบสนองต่อผู้ใช้ เช่น ตรวจสอบฟอร์มก่อนส่ง</li>
+<li>ไฟล์ทั้งสองชนิดเป็นสแตติกไฟล์ ตามที่อธิบายในบทที่ 12</li>
+</ul>
+<h2>ขั้นตอนที่ 2 นำไฟล์ฟอนต์และ normalize.css จาก GitHub เข้าโปรเจกต์</h2>
+<p>ดาวน์โหลดโฟลเดอร์ของบรานช์นี้เป็นไฟล์ ZIP แล้วแตกไฟล์</p>
+<figure class="code"><figcaption><span>ที่อยู่ดาวน์โหลด (เปิดในเบราว์เซอร์)</span><button type="button">คัดลอก</button></figcaption><pre><code>https://github.com/potchangelo/django-junraider/archive/refs/heads/13-static-css-js.zip</code></pre></figure>
+<p>คัดลอกไฟล์และโฟลเดอร์ต่อไปนี้จาก <code>app_general/static/app_general/</code> ในไฟล์ที่แตกออกมา ไปไว้ใน <code>app_general/static/app_general/</code> ของโปรเจกต์</p>
+<ul>
+<li>โฟลเดอร์ <code>fonts</code> ซึ่งเก็บไฟล์ฟอนต์ Mitr (ฟอนต์ภาษาไทยและละติน) หลายรูปแบบไฟล์ เพื่อให้เบราว์เซอร์แต่ละชนิดเลือกใช้</li>
+<li>ไฟล์ <code>normalize.css</code> เป็นไฟล์ CSS ของบุคคลที่สามที่ช่วยให้เบราว์เซอร์ต่าง ๆ แสดงองค์ประกอบ HTML พื้นฐานได้ใกล้เคียงกัน (ส่วนหัวไฟล์ระบุ normalize.css v8.0.1 สัญญา MIT) ไม่ต้องแก้ไขไฟล์นี้</li>
+<li>ไฟล์ <code>main.css</code> (อธิบายในขั้นตอนที่ 3)</li>
+<li>ไฟล์ <code>home-bg.jpg</code> ให้เขียนทับไฟล์เดิม เพราะบรานช์นี้เปลี่ยนภาพพื้นหลังหน้าแรก</li>
+</ul>
+<p>ไฟล์ <code>main.css</code> มีเนื้อหายาว จึงคัดลอกแทนการพิมพ์ ส่วน <code>main.js</code> ในขั้นตอนที่ 4 สั้น ให้พิมพ์ตามโค้ด ดูไฟล์ในรีโพสิตอรีที่ <a href="https://github.com/potchangelo/django-junraider/tree/13-static-css-js/app_general/static/app_general" target="_blank" rel="noopener">app_general/static/app_general</a></p>
+<h2>ขั้นตอนที่ 3 ทำความเข้าใจไฟล์ main.css</h2>
+<p>ไฟล์ <code>app_general/static/app_general/main.css</code> ที่คัดลอกมาในขั้นตอนที่ 2 มีเนื้อหาดังนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/13-static-css-js/app_general/static/app_general/main.css" target="_blank" rel="noopener">app_general/static/app_general/main.css</a></span><button type="button">คัดลอก</button></figcaption><pre><code>/* mitr-300 - thai_latin */
+@font-face {
+    font-family: 'Mitr';
+    font-style: normal;
+    font-weight: 300;
+    src: url('fonts/mitr-v6-thai_latin-300.eot'); /* IE9 Compat Modes */
+    src: local(''),
+        url('fonts/mitr-v6-thai_latin-300.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+        url('fonts/mitr-v6-thai_latin-300.woff2') format('woff2'), /* Super Modern Browsers */
+        url('fonts/mitr-v6-thai_latin-300.woff') format('woff'), /* Modern Browsers */
+        url('fonts/mitr-v6-thai_latin-300.ttf') format('truetype'), /* Safari, Android, iOS */
+        url('fonts/mitr-v6-thai_latin-300.svg#Mitr') format('svg'); /* Legacy iOS */
+}
+
+/* mitr-regular - thai_latin */
+@font-face {
+    font-family: 'Mitr';
+    font-style: normal;
+    font-weight: 400;
+    src: url('fonts/mitr-v6-thai_latin-regular.eot'); /* IE9 Compat Modes */
+    src: local(''),
+        url('fonts/mitr-v6-thai_latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+        url('fonts/mitr-v6-thai_latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+        url('fonts/mitr-v6-thai_latin-regular.woff') format('woff'), /* Modern Browsers */
+        url('fonts/mitr-v6-thai_latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+        url('fonts/mitr-v6-thai_latin-regular.svg#Mitr') format('svg'); /* Legacy iOS */
+}
+
+/* Global */
+*, ::before, ::after {
+    box-sizing: border-box;
+}
+
+html {
+    color: #333333;
+    font-family: 'Mitr', sans-serif;
+    font-weight: 300;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #111111;
+    font-weight: 400;
+    line-height: 1.4;
+    margin-top: 0px;
+    margin-bottom: 16px;
+}
+
+h1 {
+    font-size: 32px;
+}
+
+h2 {
+    font-size: 28px;
+}
+
+h3 {
+    font-size: 24px;
+}
+
+h4 {
+    font-size: 22px;
+}
+
+h5 {
+    font-size: 20px;
+}
+
+h6 {
+    font-size: 18px;
+}
+
+p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-top: 0px;
+    margin-bottom: 16px;
+}
+
+a {
+    color: #0D79F2;
+}
+
+.text-gray {
+    color: #888888;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.image-block {
+    display: block;
+    max-width: 100%;
+    margin-bottom: 12px;
+}
+
+.content-section {
+    padding: 64px 16px;
+}
+
+.content-section-single {
+    min-height: calc(100vh - 150px);
+}
+
+.content-container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.content-container-narrow {
+    max-width: 600px;
+}
+
+.content-title {
+    margin-bottom: 24px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: 16px;
+    row-gap: 16px;
+    margin-bottom: 16px;
+}
+
+@media screen and (min-width: 720px) {
+    .grid-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .grid-3 {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+/* Site header */
+.site-header {
+    background-color: white;
+    border-bottom: 1px solid #eeeeee;
+    box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: flex-start;
+    height: 50px;
+}
+
+.site-header-item {
+    color: #111111;
+    background-color: rgba(0, 0, 0, 0);
+    font-weight: 400;
+    line-height: 1;
+    text-decoration: none;
+    display: flex;
+    padding: 0px 10px;
+    align-items: center;
+    transition: background-color 0.3s;
+}
+
+.site-header-item:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.site-header-brand img {
+    display: inline-block;
+    height: 30px;
+    margin-right: 6px;
+}
+
+/* Site footer */
+.site-footer {
+    background-color: #eeeeee;
+    text-align: center;
+    padding: 16px;
+}
+
+.site-footer-copyright {
+    font-size: 12px;
+    margin-top: 32px;
+    margin-bottom: 0px;
+}
+
+/* Form */
+.form-field {
+    margin-bottom: 16px;
+}
+
+label {
+    display: block;
+    margin-bottom: 4px;
+    line-height: 1.6;
+}
+
+input[type='text'], 
+input[type='email'] {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    border: 1px solid #888888;
+    border-radius: 8px;
+    font-size: 16px;
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 4px 12px;
+    outline: none;
+}
+
+.button {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    color: white;
+    background-color: #111111;
+    border: none;
+    border-radius: 8px;
+    font-weight: 400;
+    line-height: 1;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.button-primary {
+    background-color: #0D79F2;
+}
+
+.button-primary:hover {
+    background-color: #085dbd;
+}
+
+input[type='text']:focus, 
+input[type='email']:focus {
+    border-color: #0D79F2;
+}
+
+/* Homepage */
+.home-landing {
+    background-color: lightblue;
+    background-image: url('home-bg.jpg');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    text-align: center;
+    padding: 108px 16px;
+}
+
+.home-landing-text {
+    text-shadow: 0px 0px 1px rgba(255, 255, 255, 1);
+    margin-top: 0px;
+    margin-bottom: 24px;
+}
+
+/* Foods */
+.food-image-link {
+    display: block;
+}
+
+.food-title a:not(:hover) {
+    color: #111111;
+    text-decoration: none;
+}</code></pre></figure>
+<p>คำอธิบายแยกตามส่วนของไฟล์</p>
+<table class="exp"><thead><tr><th>ส่วนของไฟล์</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>@font-face { font-family: 'Mitr'; ... }</code></td><td>กำหนดฟอนต์ที่เบราว์เซอร์ต้องดาวน์โหลดมาใช้ โดย <code>src: url('fonts/...')</code> ระบุที่อยู่ไฟล์ฟอนต์เทียบจากไฟล์ CSS นี้ มี 2 น้ำหนัก คือ 300 (บาง) และ 400 (ปกติ)</td></tr>
+<tr><td><code>*, ::before, ::after { box-sizing: border-box; }</code></td><td>ให้ความกว้างและความสูงขององค์ประกอบนับรวมแพดดิง (Padding) และเส้นขอบ ทำให้คำนวณขนาดง่ายขึ้น</td></tr>
+<tr><td><code>html { color; font-family: 'Mitr', sans-serif; font-weight: 300; }</code></td><td>กำหนดสีตัวอักษรและฟอนต์พื้นฐานทั้งหน้า ถ้าเบราว์เซอร์ไม่มีฟอนต์ Mitr จะใช้ฟอนต์ <code>sans-serif</code> ของระบบแทน</td></tr>
+<tr><td><code>h1 ... h6, p, a</code></td><td>กำหนดขนาดตัวอักษร ระยะห่างบรรทัด (<code>line-height</code>) ระยะขอบล่าง (<code>margin-bottom</code>) ของหัวข้อ ย่อหน้า และสีลิงก์</td></tr>
+<tr><td><code>.text-gray, .text-center, .image-block</code></td><td>คลาสใช้ซ้ำสำหรับสีเทา การจัดกึ่งกลางข้อความ และภาพที่แสดงเป็นบล็อกและไม่กว้างเกินพื้นที่ (<code>max-width: 100%</code>)</td></tr>
+<tr><td><code>.content-section, .content-container</code></td><td>กำหนดระยะขอบของส่วนเนื้อหาและความกว้างสูงสุด 1200px โดยจัดกึ่งกลางด้วย <code>margin-left/right: auto</code></td></tr>
+<tr><td><code>.grid, .grid-2, .grid-3</code></td><td>จัดวางแบบตาราง (<code>display: grid</code>) เริ่มต้นเป็น 1 คอลัมน์ เมื่อหน้าจอกว้างอย่างน้อย 720px (<code>@media screen and (min-width: 720px)</code>) จึงแบ่งเป็น 2 หรือ 3 คอลัมน์เท่ากัน (<code>1fr 1fr 1fr</code>)</td></tr>
+<tr><td><code>.site-header, .site-header-item, .site-header-brand</code></td><td>ส่วนหัวของเว็บ จัดเรียงลิงก์ในแนวนอนด้วย <code>display: flex</code> มีเงา (<code>box-shadow</code>) และเปลี่ยนสีพื้นหลังเมื่อเลื่อนเมาส์ไปชี้ (<code>:hover</code>) พร้อมการเปลี่ยนสีอย่างค่อยเป็นค่อยไป (<code>transition</code>)</td></tr>
+<tr><td><code>.site-footer, .site-footer-copyright</code></td><td>ส่วนท้ายของเว็บ พื้นหลังสีเทาอ่อน ข้อความกึ่งกลาง</td></tr>
+<tr><td><code>label, input[type='text'], input[type='email'], .form-field</code></td><td>รูปแบบของฟอร์ม ช่องกรอกมีเส้นขอบ มุมโค้ง (<code>border-radius</code>) และเปลี่ยนสีเส้นขอบเมื่อคลิกอยู่ในช่อง (<code>:focus</code>)</td></tr>
+<tr><td><code>.button, .button-primary</code></td><td>ปุ่มและลิงก์ที่ดูเป็นปุ่ม <code>.button-primary</code> เปลี่ยนสีพื้นหลังเป็นสีน้ำเงิน</td></tr>
+<tr><td><code>.home-landing, .home-landing-text</code></td><td>ส่วนบนสุดของหน้าแรกที่ใช้ภาพ <code>home-bg.jpg</code> เป็นพื้นหลัง (<code>background-image</code>) ขยายให้เต็มพื้นที่ (<code>background-size: cover</code>)</td></tr>
+<tr><td><code>.food-image-link, .food-title a:not(:hover)</code></td><td>ลิงก์ภาพเมนูและชื่อเมนู ชื่อเมนูมีสีดำและไม่มีขีดเส้นใต้ ยกเว้นขณะเลื่อนเมาส์ไปชี้</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 4 สร้างไฟล์ main.js</h2>
+<p>สร้างไฟล์ <code>app_general/static/app_general/main.js</code> แล้วพิมพ์โค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/13-static-css-js/app_general/static/app_general/main.js" target="_blank" rel="noopener">app_general/static/app_general/main.js</a></span><button type="button">คัดลอก</button></figcaption><pre><code>console.log('จันทร์ไรเดอร์');
+
+const subscriptionForm = document.querySelector('.subscription-form');
+
+function foodSetValidation(event) {
+    const checkedFoodSet = document.querySelectorAll('input[name="food_set"]:checked');
+    if (checkedFoodSet.length === 0) {
+        event.preventDefault();
+        alert('กรุณาเลือกเมนูอย่างน้อย 1 เมนู');
+    }
+}
+
+if (!!subscriptionForm) {
+    subscriptionForm.addEventListener('submit', foodSetValidation);
+}</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>console.log('จันทร์ไรเดอร์');</code></td><td>แสดงข้อความในคอนโซลของเบราว์เซอร์ (เปิดด้วยปุ่ม F12) ใช้ตรวจว่าไฟล์ถูกโหลดแล้ว</td></tr>
+<tr><td><code>const subscriptionForm = document.querySelector('.subscription-form');</code></td><td>ค้นหาองค์ประกอบแรกในหน้าที่มีคลาส <code>subscription-form</code> เก็บในตัวแปรคงที่ (<code>const</code>) ถ้าไม่พบ ค่าเป็น <code>null</code></td></tr>
+<tr><td><code>function foodSetValidation(event) { ... }</code></td><td>ฟังก์ชันตรวจสอบ ค้นหาเช็กบอกซ์ <code>food_set</code> ที่ถูกเลือกทั้งหมดด้วย <code>querySelectorAll('input[name="food_set"]:checked')</code></td></tr>
+<tr><td><code>if (checkedFoodSet.length === 0)</code></td><td>ถ้าไม่ได้เลือกเมนูใด</td></tr>
+<tr><td><code>event.preventDefault();</code></td><td>ยกเลิกการส่งฟอร์ม</td></tr>
+<tr><td><code>alert('กรุณาเลือกเมนูอย่างน้อย 1 เมนู');</code></td><td>แสดงกล่องข้อความเตือนผู้ใช้</td></tr>
+<tr><td><code>if (!!subscriptionForm) { ... addEventListener('submit', ...) }</code></td><td>เครื่องหมาย <code>!!</code> แปลงค่าเป็นบูลีน ถ้าหน้านั้นมีฟอร์ม ให้เรียกฟังก์ชันตรวจสอบเมื่อมีการส่ง (<code>submit</code>) ไฟล์นี้ถูกโหลดทุกหน้า จึงต้องตรวจก่อนว่ามีฟอร์มหรือไม่</td></tr>
+</tbody></table>
+<p>การตรวจสอบในเบราว์เซอร์ช่วยให้ผู้ใช้เห็นข้อผิดพลาดเร็วขึ้น แต่ไม่ได้แทนการตรวจสอบของ Django ในบทที่ 10 ซึ่งทำงานที่เซิร์ฟเวอร์</p>
+<h2>ขั้นตอนที่ 5 เชื่อมไฟล์เข้ากับเทมเพลตฐาน</h2>
+<p>แทนที่เนื้อหาของ <code>base.html</code> ด้วยโค้ดนี้ ส่วนที่เพิ่มคือแท็ก <code>&lt;link&gt;</code> 2 บรรทัดและแท็ก <code>&lt;script&gt;</code></p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/13-static-css-js/app_general/templates/app_general/components/base.html" target="_blank" rel="noopener">app_general/templates/app_general/components/base.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% load static %}
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;{% block site_title %}{% endblock %}จันทร์ไรเดอร์ เมนูอร่อย ส่งบ่อย ส่งแม่น&lt;/title&gt;
+    &lt;link rel="icon" href="{% static 'app_general/favicon.ico' %}"&gt;
+    &lt;link rel="stylesheet" href="{% static 'app_general/normalize.css' %}"&gt;
+    &lt;link rel="stylesheet" href="{% static 'app_general/main.css' %}"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    {% include 'app_general/components/site_header.html' %}
+    {% block content %}{% endblock %}
+    {% include 'app_general/components/site_footer.html' %}
+    &lt;script src="{% static 'app_general/main.js' %}"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>&lt;link rel="stylesheet" href="{% static 'app_general/normalize.css' %}"&gt;</code></td><td>โหลดไฟล์ CSS ต้องโหลด <code>normalize.css</code> ก่อน เพื่อให้กฎใน <code>main.css</code> ที่โหลดภายหลังมีผลเหนือกว่า</td></tr>
+<tr><td><code>&lt;script src="{% static 'app_general/main.js' %}"&gt;&lt;/script&gt;</code></td><td>โหลดไฟล์ JavaScript ไว้ท้าย <code>&lt;body&gt;</code> เพื่อให้องค์ประกอบของหน้าถูกสร้างครบก่อนสคริปต์ทำงาน</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 6 ปรับเทมเพลตให้ใช้คลาส CSS</h2>
+<p>แทนที่เนื้อหาทั้งไฟล์ของเทมเพลตต่อไปนี้ แต่ละไฟล์ใช้ชื่อคลาสที่กำหนดใน <code>main.css</code> และลบรูปแบบ <code>style="..."</code> ที่เขียนไว้ในแท็กโดยตรงออก</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/13-static-css-js/app_general/templates/app_general/components/site_header.html" target="_blank" rel="noopener">app_general/templates/app_general/components/site_header.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% load static %}
+&lt;header class="site-header"&gt;
+    &lt;a class="site-header-item site-header-brand" href="{% url 'home' %}"&gt;
+        &lt;img src="{% static 'app_general/logo.png' %}"&gt;
+        &lt;span&gt;จันทร์ไรเดอร์&lt;/span&gt;
+    &lt;/a&gt;
+    &lt;a class="site-header-item" href="{% url 'foods' %}"&gt;
+        &lt;span&gt;เมนูทั้งหมด&lt;/span&gt;
+    &lt;/a&gt;
+    &lt;a class="site-header-item" href="{% url 'about' %}"&gt;
+        &lt;span&gt;เกี่ยวกับ&lt;/span&gt;
+    &lt;/a&gt;
+&lt;/header&gt;</code></pre></figure>
+<p>ส่วนที่เปลี่ยนคือลบ <code>style</code> ที่กำหนดสีพื้นหลังสีเทา และครอบข้อความของลิงก์ เมนูทั้งหมด และ เกี่ยวกับ ด้วยแท็ก <code>&lt;span&gt;</code></p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/13-static-css-js/app_general/templates/app_general/components/site_footer.html" target="_blank" rel="noopener">app_general/templates/app_general/components/site_footer.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>&lt;footer class="site-footer"&gt;
+    &lt;h6&gt;ติดตามความเคลื่อนไหวและโปรโมชั่นได้ที่&lt;/h6&gt;
+    &lt;p&gt;
+        &lt;a href="#"&gt;Facebook&lt;/a&gt;
+        &lt;a href="#"&gt;Twitter&lt;/a&gt;
+        &lt;a href="#"&gt;Instagram&lt;/a&gt;
+    &lt;/p&gt;
+    &lt;p class="site-footer-copyright"&gt;Copyright 2021-2022 Junraider. All right reserved.&lt;/p&gt;
+&lt;/footer&gt;</code></pre></figure>
+<p>ส่วนที่เปลี่ยนคือลบ <code>style</code> เปลี่ยนหัวข้อจาก <code>&lt;h4&gt;</code> เป็น <code>&lt;h6&gt;</code> ลบ <code>class</code> ของลิงก์ และเพิ่มคลาส <code>site-footer-copyright</code> ให้ย่อหน้าลิขสิทธิ์</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/13-static-css-js/app_general/templates/app_general/home.html" target="_blank" rel="noopener">app_general/templates/app_general/home.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+{% load static %}
+
+{% block content %}
+&lt;section class="home-landing"&gt;
+    &lt;h1 class="home-landing-text"&gt;จันทร์ไรเดอร์&lt;/h1&gt;
+    &lt;h4 class="home-landing-text"&gt;ไอศครีมอร่อย ส่งบ่อย ส่งแม่น&lt;/h4&gt;
+    &lt;h6 class="home-landing-text"&gt;จัดส่งไอศครีมรสโปรดของคุณ ทุกวันจันทร์แรก จันทร์ที่สอง หรือจันทร์ที่สาม ของแต่ละเดือน&lt;/h6&gt;
+    &lt;p&gt;
+        &lt;a class="button" href="{% url 'foods' %}"&gt;ดูเมนูทั้งหมด&lt;/a&gt;
+        &lt;a class="button button-primary" href="{% url 'subscription' %}"&gt;ลงทะเบียนรับโปรโมชั่น&lt;/a&gt;
+    &lt;/p&gt;
+&lt;/section&gt;
+&lt;section class="content-section"&gt;
+    &lt;div class="content-container"&gt;
+        &lt;h3 class="content-title text-center"&gt;อธิบายอะไรซักหน่อย&lt;/h3&gt;
+        &lt;div class="grid grid-3"&gt;
+            &lt;div&gt;
+                &lt;img class="image-block" src="{% static 'app_general/home-about-1.jpg' %}"&gt;
+                &lt;p&gt;จันทร์ไรเดอร์ คือ บริการจัดส่งไอศครีมอร่อยถึงมือคุณ เดือนละครั้ง ในวันจันทร์ที่คุณสะดวกรับ&lt;/p&gt;
+            &lt;/div&gt;
+            &lt;div&gt;
+                &lt;img class="image-block" src="{% static 'app_general/home-about-2.jpg' %}"&gt;
+                &lt;p&gt;จันทร์ไรแมน คือ พนักงานส่งไอศครีม ขี่ไวแบบไม่ย้อนศร และฉีดวัคซีนครบ 2 เข็มแล้วทุกคน&lt;/p&gt;
+            &lt;/div&gt;
+            &lt;div&gt;
+                &lt;img class="image-block" src="{% static 'app_general/home-about-3.jpg' %}"&gt;
+                &lt;p&gt;ไอศครีมทุกรสรังสรรค์ขึ้นมาอย่างพิถีพิถัน ไม่หวั่นแม้ออเดอร์มามาก&lt;/p&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;p class="text-center"&gt;
+            &lt;a class="button" href="{% url 'about' %}"&gt;เกี่ยวกับจันทร์ไรเดอร์&lt;/a&gt;
+        &lt;/p&gt;
+    &lt;/div&gt;
+&lt;/section&gt;
+{% endblock %}</code></pre></figure>
+<p>ส่วนที่เปลี่ยนคือส่วนแรก (<code>home-landing</code>) เปลี่ยนข้อความใต้หัวข้อจาก <code>&lt;p&gt;</code> เป็น <code>&lt;h4&gt;</code> และ <code>&lt;h6&gt;</code> และเพิ่มปุ่ม 2 ปุ่ม ส่วนที่สอง (<code>content-section</code>) เปลี่ยนหัวข้อจาก <code>&lt;h2&gt;</code> เป็น <code>&lt;h3&gt;</code> จัดภาพ 3 ภาพเป็น 3 คอลัมน์ด้วย <code>grid grid-3</code> และเพิ่มปุ่มไปหน้าเกี่ยวกับ</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/13-static-css-js/app_general/templates/app_general/about.html" target="_blank" rel="noopener">app_general/templates/app_general/about.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}เกี่ยวกับหมู่เฮา - {% endblock %}
+
+{% block content %}
+&lt;section class="content-section content-section-single"&gt;
+    &lt;div class="content-container"&gt;
+        &lt;h3 class="content-title"&gt;เกี่ยวกับจันทร์ไรเดอร์&lt;/h3&gt;
+        &lt;h5&gt;ก่อตั้ง 2021&lt;/h5&gt;
+        &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc luctus finibus augue, et ornare tellus lacinia id. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras vehicula erat ac neque efficitur, eget rutrum turpis vulputate. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec pulvinar vel nibh ac bibendum.&lt;/p&gt;
+        &lt;h5&gt;วัตถุดิบชั้นยอด&lt;/h5&gt;
+        &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc luctus finibus augue, et ornare tellus lacinia id. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras vehicula erat ac neque efficitur, eget rutrum turpis vulputate. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec pulvinar vel nibh ac bibendum.&lt;/p&gt;
+        &lt;h5&gt;สุดยอดจันทร์ไรแมน&lt;/h5&gt;
+        &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc luctus finibus augue, et ornare tellus lacinia id. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras vehicula erat ac neque efficitur, eget rutrum turpis vulputate. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec pulvinar vel nibh ac bibendum.&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/section&gt;
+{% endblock %}</code></pre></figure>
+<p>ส่วนที่เปลี่ยนคือครอบเนื้อหาด้วย <code>&lt;section&gt;</code> และ <code>&lt;div class="content-container"&gt;</code> เปลี่ยนหัวข้อหลักเป็น <code>&lt;h3 class="content-title"&gt;</code> และหัวข้อย่อยจาก <code>&lt;h4&gt;</code> เป็น <code>&lt;h5&gt;</code></p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/13-static-css-js/app_foods/templates/app_foods/foods.html" target="_blank" rel="noopener">app_foods/templates/app_foods/foods.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+{% load static %}
+
+{% block site_title %}เมนูอร่อยทั้งหมด - {% endblock %}
+
+{% block content %}
+&lt;section class="content-section content-section-single"&gt;
+    &lt;div class="content-container"&gt;
+        &lt;h3 class="content-title"&gt;เมนูอร่อย ส่งบ่อย ส่งแม่น&lt;/h3&gt;
+        {% if foods.count &gt; 0 %}
+            &lt;div class="grid grid-3"&gt;
+                {% for food in foods %}
+                    &lt;div&gt;
+                        &lt;a class="food-image-link" href="{% url 'food' food.id %}"&gt;
+                            &lt;img class="image-block" src="{% static food.image_relative_url %}"&gt;
+                        &lt;/a&gt;
+                        &lt;h6 class="food-title"&gt;
+                            &lt;a href="{% url 'food' food.id %}"&gt;{{ food.title }}&lt;/a&gt;
+                        &lt;/h6&gt;
+                        {% if food.special_price is not None %}
+                            &lt;p&gt;
+                                &lt;b&gt;{{ food.special_price|floatformat:'g' }} บาท&lt;/b&gt; 
+                                &lt;del class="text-gray"&gt;{{ food.price|floatformat:'g' }} บาท&lt;/del&gt;
+                            &lt;/p&gt;
+                        {% else %}
+                            &lt;p&gt;&lt;b&gt;{{ food.price|floatformat:'g' }} บาท&lt;/b&gt;&lt;/p&gt;
+                        {% endif %}
+                        {% if food.is_premium %}
+                            &lt;p&gt;*** เมนูพิเศษสุด Premium&lt;/p&gt;
+                        {% endif %}
+                        {% if food.promotion_end_at is not None %}
+                            &lt;p&gt;โปรโมชั่นถึงวันที่ {{ food.promotion_end_at|date:'j N Y' }}&lt;/p&gt;
+                        {% endif %}
+                    &lt;/div&gt;
+                {% endfor %}
+            &lt;/div&gt;
+        {% else %}
+            &lt;p&gt;วัตถุดิบกำลังเดินทางมาจากทะเลอันไกลโพ้นนนน กรุณารอความอร่อยอีกไม่นาน&lt;/p&gt;
+        {% endif %}
+    &lt;/div&gt;
+&lt;/section&gt;
+{% endblock %}</code></pre></figure>
+<p>ส่วนที่เปลี่ยนคือครอบเนื้อหาด้วย <code>&lt;section&gt;</code> เปลี่ยนหัวข้อจาก <code>&lt;h1&gt;</code> เป็น <code>&lt;h3&gt;</code> ใช้ <code>{% if foods.count &gt; 0 %}</code> แทนแท็ก <code>{% empty %}</code> จัดรายการเป็น 3 คอลัมน์ แสดงราคาพร้อมคำว่า บาท โดยราคาพิเศษอยู่ก่อนราคาเดิม และใช้คลาส <code>text-gray</code> แทน <code>style</code></p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/13-static-css-js/app_foods/templates/app_foods/food.html" target="_blank" rel="noopener">app_foods/templates/app_foods/food.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+{% load static %}
+
+{% block site_title %}{{ food.title }} - {% endblock %}
+
+{% block content %}
+&lt;section class="content-section content-section-single"&gt;
+    &lt;div class="content-container"&gt;
+        {% if food is not None %}
+            &lt;div class="grid grid-2"&gt;
+                &lt;img class="image-block" src="{% static food.image_relative_url %}"&gt;
+                &lt;div&gt;
+                    &lt;h3&gt;{{ food.title }}&lt;/h3&gt;
+                    {% if food.special_price is not None %}
+                        &lt;p&gt;
+                            &lt;b&gt;{{ food.special_price|floatformat:'g' }} บาท&lt;/b&gt; 
+                            &lt;del class="text-gray"&gt;{{ food.price|floatformat:'g' }} บาท&lt;/del&gt;
+                        &lt;/p&gt;
+                    {% else %}
+                        &lt;p&gt;&lt;b&gt;{{ food.price|floatformat:'g' }} บาท&lt;/b&gt;&lt;/p&gt;
+                    {% endif %}
+                    {% if food.is_premium %}
+                        &lt;p&gt;*** เมนูพิเศษสุด Premium&lt;/p&gt;
+                    {% endif %}
+                    {% if food.promotion_end_at is not None %}
+                        &lt;p&gt;โปรโมชั่นถึงวันที่ {{ food.promotion_end_at|date:'j N Y' }}&lt;/p&gt;
+                    {% endif %}
+                    &lt;p&gt;{{ food.description }}&lt;/p&gt;
+                    &lt;p&gt;
+                        &lt;a class="button button-primary" href="{% url 'subscription' %}"&gt;ลงทะเบียนรับโปรโมชั่น&lt;/a&gt;
+                    &lt;/p&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        {% else %}
+            &lt;h3&gt;ไม่พบเมนู&lt;/h3&gt;
+            &lt;p&gt;เมนูอาจถูกลบไปแล้ว หรือมันอาจไม่เคยมีอยู่จริง&lt;/p&gt;
+            &lt;p&gt;
+                &lt;a class="button button-primary" href="{% url 'foods' %}"&gt;กลับไปหน้าเมนูทั้งหมด&lt;/a&gt;
+            &lt;/p&gt;
+        {% endif %}
+    &lt;/div&gt;
+&lt;/section&gt;
+{% endblock %}</code></pre></figure>
+<p>ส่วนที่เปลี่ยนคือจัดภาพไว้ซ้ายและรายละเอียดไว้ขวาด้วย <code>grid grid-2</code> เพิ่มปุ่ม ลงทะเบียนรับโปรโมชั่น และกรณีไม่พบเมนูเปลี่ยนข้อความเป็นหัวข้อ <code>&lt;h3&gt;</code> แล้วเพิ่มคำอธิบายกับปุ่ม กลับไปหน้าเมนูทั้งหมด</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/13-static-css-js/app_general/templates/app_general/subscription_form.html" target="_blank" rel="noopener">app_general/templates/app_general/subscription_form.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}ลงทะเบียนรับโปรโมชั่น - {% endblock %}
+
+{% block content %}
+&lt;section class="content-section content-section-single"&gt;
+    &lt;div class="content-container content-container-narrow"&gt;
+        &lt;h3 class="content-title"&gt;ลงทะเบียนรับโปรโมชั่น&lt;/h3&gt;
+        &lt;p&gt;กรุณาใส่ข้อมูลจริง เพื่อความสะดวกราบรื่นในการรับโปรโมชั่นพิเศษ&lt;/p&gt;
+        &lt;form class="subscription-form" action="{% url 'subscription' %}" method="POST"&gt;
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            &lt;div class="form-field"&gt;
+                {{ form.name.label_tag }}
+                {{ form.name }}
+                {{ form.name.errors }}
+            &lt;/div&gt;
+            &lt;div class="form-field"&gt;
+                {{ form.email.label_tag }}
+                {{ form.email }}
+                {{ form.email.errors }}
+            &lt;/div&gt;
+            &lt;div class="form-field"&gt;
+                {{ form.food_set.label_tag }}
+                {{ form.food_set }}
+                {{ form.food_set.errors }}
+            &lt;/div&gt;
+            &lt;div class="form-field"&gt;
+                &lt;label&gt;อ่านข้อตกลงเพิ่มเติม&lt;/label&gt;
+                &lt;label&gt;
+                    {{ form.accepted }} {{ form.accepted.label }}
+                &lt;/label&gt;
+                {{ form.accepted.errors }}
+            &lt;/div&gt;
+            &lt;div class="form-field"&gt;
+                &lt;button class="button button-primary" type="submit"&gt;ลงทะเบียนรับโปรโมชั่น&lt;/button&gt;
+            &lt;/div&gt;
+        &lt;/form&gt;
+    &lt;/div&gt;
+&lt;/section&gt;
+{% endblock %}</code></pre></figure>
+<p>ส่วนที่เปลี่ยนคือครอบเนื้อหาด้วย <code>&lt;section&gt;</code> และกล่องแคบ (<code>content-container-narrow</code>) เปลี่ยนหัวข้อจาก <code>&lt;h1&gt;</code> เป็น <code>&lt;h3&gt;</code> เพิ่มย่อหน้าแนะนำ เพิ่มคลาส <code>subscription-form</code> ให้ฟอร์ม ใช้ <code>&lt;div class="form-field"&gt;</code> แทน <code>style</code> และเพิ่มคลาส <code>button button-primary</code> ให้ปุ่ม</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/13-static-css-js/app_general/templates/app_general/subscription_thankyou.html" target="_blank" rel="noopener">app_general/templates/app_general/subscription_thankyou.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}ขอบคุณสำหรับการลงทะเบียน - {% endblock %}
+
+{% block content %}
+&lt;section class="content-section content-section-single"&gt;
+    &lt;div class="content-container content-container-narrow"&gt;
+        &lt;h3 class="content-title"&gt;ขอบคุณสำหรับการลงทะเบียน&lt;/h3&gt;
+        &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc luctus finibus augue, et ornare tellus lacinia id. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.&lt;/p&gt;
+        &lt;p&gt;
+            &lt;a class="button button-primary" href="{% url 'home' %}"&gt;กลับหน้าแรก&lt;/a&gt;
+        &lt;/p&gt;
+    &lt;/div&gt;
+&lt;/section&gt;
+{% endblock %}</code></pre></figure>
+<p>ส่วนที่เปลี่ยนคือครอบเนื้อหาด้วย <code>&lt;section&gt;</code> เปลี่ยนหัวข้อจาก <code>&lt;h1&gt;</code> เป็น <code>&lt;h3&gt;</code> และเปลี่ยนลิงก์ กลับหน้าแรก ให้แสดงเป็นปุ่ม</p>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>&lt;section class="content-section content-section-single"&gt;</code></td><td>แท็ก <code>&lt;section&gt;</code> แบ่งส่วนของหน้า และใช้คลาสจาก <code>main.css</code> กำหนดระยะขอบและความสูงขั้นต่ำ</td></tr>
+<tr><td><code>&lt;div class="grid grid-3"&gt;</code></td><td>จัดรายการเมนูเป็น 3 คอลัมน์ (หน้ารายละเอียดเมนูใช้ <code>grid-2</code>)</td></tr>
+<tr><td><code>{% if foods.count &gt; 0 %}</code></td><td>เรียกเมธอด <code>count</code> ของ QuerySet ในเทมเพลตโดยไม่ต้องใส่วงเล็บ แล้วเทียบว่ามากกว่า 0 ถ้ามีเมนูจึงแสดงรายการ ถ้าไม่มีให้แสดงข้อความในส่วน <code>{% else %}</code> (แทนแท็ก <code>{% empty %}</code> ของบทที่ 5)</td></tr>
+<tr><td><code>&lt;a class="button button-primary" href="..."&gt;</code></td><td>ลิงก์ที่แสดงเป็นปุ่มสีน้ำเงิน</td></tr>
+<tr><td><code>&lt;form class="subscription-form" ...&gt;</code></td><td>คลาส <code>subscription-form</code> คือคลาสที่ <code>main.js</code> ใช้ค้นหาฟอร์มเพื่อตรวจสอบก่อนส่ง</td></tr>
+<tr><td><code>&lt;div class="form-field"&gt;</code></td><td>กลุ่มของช่องกรอกแต่ละช่อง กำหนดระยะห่างด้วย <code>main.css</code></td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 7 เปิดเซิร์ฟเวอร์และทดสอบ</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py runserver</code></pre></figure>
+<p>หากหน้าเว็บยังเป็นรูปแบบเดิม ให้กด Ctrl และ F5 พร้อมกันเพื่อโหลดหน้าใหม่โดยไม่ใช้แคช (Cache) แคชคือสำเนาไฟล์ที่เบราว์เซอร์เก็บไว้ในเครื่อง ซึ่งอาจยังเป็นไฟล์ CSS เดิม</p>
+<h2>ผลลัพธ์ที่ควรได้</h2>
+<table class="exp"><thead><tr><th>ที่อยู่</th><th>ผลที่เห็น</th></tr></thead><tbody>
+<tr><td><code>ทุกหน้า</code></td><td>ตัวอักษรเป็นฟอนต์ Mitr ส่วนหัวเป็นแถบสีขาวมีเงา พร้อมโลโก้ ลิงก์เปลี่ยนสีพื้นหลังเมื่อเลื่อนเมาส์ชี้ ส่วนท้ายเป็นพื้นหลังสีเทาอ่อน ข้อความกึ่งกลาง</td></tr>
+<tr><td><code>http://127.0.0.1:8000/</code></td><td>ส่วนบนมีภาพพื้นหลัง ข้อความกึ่งกลาง และปุ่ม ดูเมนูทั้งหมด กับ ลงทะเบียนรับโปรโมชั่น ส่วนล่างมี 3 ภาพเรียงเป็น 3 คอลัมน์พร้อมข้อความ</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/</code></td><td>ภาพเมนูเรียงเป็นตาราง 3 คอลัมน์ ภาพมีขนาดพอดีคอลัมน์ ราคาแสดงเป็น ตัวเลข บาท โดยเมนู Yellow Sunrise มีราคาพิเศษและราคาเดิมสีเทาขีดฆ่า</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/1</code></td><td>ภาพอยู่ซ้ายและรายละเอียดอยู่ขวา พร้อมปุ่ม ลงทะเบียนรับโปรโมชั่น</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/99</code></td><td>แสดงข้อความ ไม่พบเมนู พร้อมปุ่ม กลับไปหน้าเมนูทั้งหมด</td></tr>
+<tr><td><code>http://127.0.0.1:8000/subscription</code></td><td>ฟอร์มกว้างไม่เกิน 600px ช่องกรอกมีมุมโค้ง ถ้ากดส่งโดยไม่เลือกเมนู จะแสดงกล่องข้อความ กรุณาเลือกเมนูอย่างน้อย 1 เมนู (หลังกรอกชื่อ อีเมล และเลือกช่องยอมรับข้อตกลงแล้ว)</td></tr>
+</tbody></table>
+<h2>โครงสร้างไฟล์หลังจบบท</h2>
+<p>แสดงเฉพาะไฟล์ที่เพิ่มหรือแก้ในบทนี้ (+ คือไฟล์ที่สร้างใหม่, * คือไฟล์ที่แก้ไข)</p>
+<figure class="code"><figcaption><span>django-junraider/</span></figcaption><pre><code>django-junraider/
+├── app_foods/templates/app_foods/
+│   ├── food.html                                  *
+│   └── foods.html                                 *
+└── app_general/
+    ├── static/app_general/
+    │   ├── fonts/  (ไฟล์ฟอนต์ Mitr)               +
+    │   ├── home-bg.jpg                            *
+    │   ├── main.css                               +
+    │   ├── main.js                                +
+    │   └── normalize.css                          +
+    └── templates/app_general/
+        ├── about.html                             *
+        ├── home.html                              *
+        ├── subscription_form.html                 *
+        ├── subscription_thankyou.html             *
+        └── components/
+            ├── base.html                          *
+            ├── site_footer.html                   *
+            └── site_header.html                   *</code></pre></figure>
+<div class="pager"><a href="ch12.html">&larr; บทก่อนหน้า: บทที่ 12</a><a href="ch14.html">บทถัดไป: บทที่ 14 &rarr;</a></div></main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

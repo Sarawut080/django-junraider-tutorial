@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 4 วิวและเทมเพลต (views x templates)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class=""><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class=""><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class=""><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class=""><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class="cur"><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class=""><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class=""><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class=""><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class=""><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class=""><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class=""><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class=""><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class=""><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class=""><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class=""><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class=""><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<p class="ch">บทที่ 4 จาก 15</p>
+<h1>วิวและเทมเพลต (views x templates)</h1>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider/tree/04-views-templates" target="_blank" rel="noopener">บรานช์ 04-views-templates</a> · <a href="https://github.com/potchangelo/django-junraider/compare/03-urls-views...04-views-templates" target="_blank" rel="noopener">ส่วนที่เปลี่ยนจากบทก่อนหน้า</a></p>
+<h2>วัตถุประสงค์</h2>
+<p>เมื่อจบบทนี้ ผู้เรียนลงทะเบียนแอปในโปรเจกต์ สร้างเทมเพลต (Template) เป็นไฟล์ HTML และเปลี่ยนวิวให้ส่งเทมเพลตกลับไปแสดงผลได้ แทนการส่งข้อความโดยตรงแบบบทที่ 3</p>
+<h2>ขั้นตอนที่ 1 ทำความเข้าใจเทมเพลต</h2>
+<p>เทมเพลตคือไฟล์ที่เก็บโครงหน้าเว็บ ในที่นี้เขียนด้วย HTML ซึ่งเป็นภาษาที่ใช้บอกเบราว์เซอร์ว่าหน้าเว็บมีส่วนประกอบอะไรบ้าง การแยกหน้าเว็บออกเป็นไฟล์เทมเพลตทำให้วิวไม่ต้องเขียน HTML จำนวนมากเป็นข้อความในโค้ด Python วิวเพียงเรียกฟังก์ชัน <code>render</code> เพื่อให้ Django นำเทมเพลตมาสร้างการตอบกลับ</p>
+<h2>ขั้นตอนที่ 2 ลงทะเบียนแอปในโปรเจกต์</h2>
+<p>Django ค้นหาไฟล์เทมเพลตในโฟลเดอร์ <code>templates</code> ของแต่ละแอปที่ลงทะเบียนไว้เท่านั้น จึงต้องลงทะเบียนแอปก่อน เปิดไฟล์ <code>project_jrd/settings.py</code> หา <code>INSTALLED_APPS</code> แล้วเพิ่ม 2 บรรทัดท้ายรายการ (ต่อจาก <code>'django.contrib.staticfiles',</code>)</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/04-views-templates/project_jrd/settings.py" target="_blank" rel="noopener">project_jrd/settings.py (ส่วนที่แก้)</a></span><button type="button">คัดลอก</button></figcaption><pre><code>INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'app_general.apps.AppGeneralConfig',
+    'app_foods.apps.AppFoodsConfig'
+]</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>INSTALLED_APPS</code></td><td>รายการแอปที่เปิดใช้งานในโปรเจกต์นี้ แอปที่มากับ Django (<code>django.contrib...</code>) มีอยู่แล้ว</td></tr>
+<tr><td><code>'app_general.apps.AppGeneralConfig'</code></td><td>เส้นทางแบบจุดไปยังคลาส <code>AppGeneralConfig</code> ในไฟล์ <code>apps.py</code> ของแอป <code>app_general</code> ซึ่งเห็นในบทที่ 2</td></tr>
+<tr><td><code>'app_foods.apps.AppFoodsConfig'</code></td><td>เช่นเดียวกัน สำหรับแอป <code>app_foods</code></td></tr>
+</tbody></table>
+<p>เหตุที่ Django หาเทมเพลตในแอปได้ เพราะใน <code>settings.py</code> ส่วน <code>TEMPLATES</code> มีค่า <code>'APP_DIRS': True</code> ซึ่งสั่งให้ค้นหาเทมเพลตในโฟลเดอร์ <code>templates</code> ของแต่ละแอปที่ลงทะเบียน</p>
+<h2>ขั้นตอนที่ 3 สร้างโฟลเดอร์ของเทมเพลต</h2>
+<p>สร้างโฟลเดอร์ซ้อนกันตามนี้ (ชื่อ <code>templates</code> ต้องสะกดตามนี้ และโฟลเดอร์ชั้นในใช้ชื่อเดียวกับแอป)</p>
+<ul>
+<li><code>app_general/templates/app_general/</code></li>
+<li><code>app_foods/templates/app_foods/</code></li>
+</ul>
+<p>Django รวมโฟลเดอร์ <code>templates</code> ของทุกแอปเป็นที่ค้นหาเดียวกัน หากสองแอปมีไฟล์ชื่อ <code>home.html</code> เหมือนกัน Django จะเลือกไฟล์แรกที่พบ การใส่โฟลเดอร์ชั้นในที่ชื่อเดียวกับแอป ทำให้ชื่อไฟล์เต็มไม่ซ้ำกัน เช่น <code>app_general/home.html</code></p>
+<h2>ขั้นตอนที่ 4 สร้างเทมเพลตของ app_general</h2>
+<h3>ไฟล์ home.html</h3>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/04-views-templates/app_general/templates/app_general/home.html" target="_blank" rel="noopener">app_general/templates/app_general/home.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;จันทร์ไรเดอร์ เมนูอร่อย ส่งบ่อย ส่งแม่น&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header class="site-header" style="background-color: lightgray;"&gt;
+        &lt;a class="site-header-item site-header-brand" href="/"&gt;จันทร์ไรเดอร์&lt;/a&gt;
+        &lt;a class="site-header-item" href="/foods"&gt;เมนูอร่อยทั้งหมด&lt;/a&gt;
+        &lt;a class="site-header-item" href="/about"&gt;เกี่ยวกับ&lt;/a&gt;
+    &lt;/header&gt;
+    &lt;h1&gt;จันทร์ไรเดอร์&lt;/h1&gt;
+    &lt;p&gt;เมนูอร่อย ส่งบ่อย ส่งแม่น&lt;/p&gt;
+    &lt;p&gt;รอก่อน เดี๋ยวเจอ&lt;/p&gt;
+    &lt;footer class="site-footer" style="background-color: lightgray;"&gt;
+        &lt;h4&gt;ติดตามความเคลื่อนไหวและโปรโมชั่นได้ที่&lt;/h4&gt;
+        &lt;p&gt;
+            &lt;a class="site-footer-item" href="#"&gt;Facebook&lt;/a&gt;
+            &lt;a class="site-header-item" href="#"&gt;Twitter&lt;/a&gt;
+            &lt;a class="site-header-item" href="#"&gt;Instagram&lt;/a&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Copyright 2021-2022 Junraider. All right reserved.&lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></figure>
+<table class="exp"><thead><tr><th>ส่วนของโค้ด</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>&lt;!DOCTYPE html&gt;</code></td><td>บอกเบราว์เซอร์ว่าเอกสารนี้เป็น HTML</td></tr>
+<tr><td><code>&lt;html lang="en"&gt; ... &lt;/html&gt;</code></td><td>แท็กครอบเอกสารทั้งหมด คุณสมบัติ <code>lang</code> ระบุภาษาของเอกสาร</td></tr>
+<tr><td><code>&lt;head&gt; ... &lt;/head&gt;</code></td><td>ส่วนข้อมูลของหน้าเว็บที่ไม่แสดงในเนื้อหา</td></tr>
+<tr><td><code>&lt;meta charset="UTF-8"&gt;</code></td><td>กำหนดการเข้ารหัสตัวอักษรเป็น UTF-8 เพื่อให้แสดงภาษาไทยถูกต้อง</td></tr>
+<tr><td><code>&lt;meta http-equiv=... &gt; และ &lt;meta name="viewport" ...&gt;</code></td><td>เมตา (Meta) ที่ระบุการทำงานร่วมกับเบราว์เซอร์ Internet Explorer และการปรับขนาดหน้าเว็บให้พอดีกับหน้าจอ ไม่มีผลต่อเนื้อหาในบทนี้</td></tr>
+<tr><td><code>&lt;title&gt;</code></td><td>ข้อความที่แสดงบนแท็บของเบราว์เซอร์</td></tr>
+<tr><td><code>&lt;body&gt; ... &lt;/body&gt;</code></td><td>ส่วนเนื้อหาที่แสดงบนหน้าเว็บ</td></tr>
+<tr><td><code>&lt;header&gt;, &lt;footer&gt;</code></td><td>ส่วนหัวและส่วนท้ายของหน้า คุณสมบัติ <code>class</code> ตั้งชื่อกลุ่มไว้อ้างอิงภายหลัง และ <code>style</code> กำหนดสีพื้นหลังเป็น <code>lightgray</code></td></tr>
+<tr><td><code>&lt;a href="/foods"&gt;</code></td><td>ลิงก์ (Link) ไปยังที่อยู่ที่ระบุใน <code>href</code> โดยข้อความระหว่างแท็กเปิดและปิดคือสิ่งที่ผู้ใช้เห็น</td></tr>
+<tr><td><code>&lt;h1&gt;, &lt;h4&gt;, &lt;p&gt;</code></td><td>หัวข้อขนาดใหญ่ หัวข้อขนาดเล็ก และย่อหน้าตามลำดับ</td></tr>
+</tbody></table>
+<h3>ไฟล์ about.html</h3>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/04-views-templates/app_general/templates/app_general/about.html" target="_blank" rel="noopener">app_general/templates/app_general/about.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;เกี่ยวกับหมู่เฮา - จันทร์ไรเดอร์ เมนูอร่อย ส่งบ่อย ส่งแม่น&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;เรื่องราวเกี่ยวกับจันทร์ไรเดอร์&lt;/h1&gt;
+    &lt;h4&gt;ก่อตั้ง&lt;/h4&gt;
+    &lt;p&gt;2021&lt;/p&gt;
+    &lt;hr&gt;
+    &lt;h4&gt;คำมั่นสัญญา&lt;/h4&gt;
+    &lt;p&gt;นับแต่วันนี้เป็นต้นไป จะรักเธอจนกว่าแมนยูได้แชมป์พรีเมียร์ลีก&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></figure>
+<p>โครงเอกสารเหมือน <code>home.html</code> ส่วนที่เพิ่มคือแท็ก <code>&lt;hr&gt;</code> ซึ่งขีดเส้นแบ่งแนวนอน</p>
+<h2>ขั้นตอนที่ 5 สร้างเทมเพลตของ app_foods</h2>
+<h3>ไฟล์ foods.html</h3>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/04-views-templates/app_foods/templates/app_foods/foods.html" target="_blank" rel="noopener">app_foods/templates/app_foods/foods.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;เมนูอร่อยทั้งหมด - จันทร์ไรเดอร์ เมนูอร่อย ส่งบ่อย ส่งแม่น&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;เมนูอร่อย ส่งบ่อย ส่งแม่น&lt;/h1&gt;
+    &lt;h3&gt;&lt;a href="/foods/1"&gt;Red spicy&lt;/a&gt;&lt;/h3&gt;
+    &lt;h3&gt;&lt;a href="/foods/2"&gt;Blue Iceberg&lt;/a&gt;&lt;/h3&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></figure>
+<p>รายการเมนูในหน้านี้เป็นข้อความที่กำหนดไว้ในไฟล์ (ลิงก์ไปยัง <code>/foods/1</code> และ <code>/foods/2</code>) จะเปลี่ยนเป็นข้อมูลที่ส่งมาจากวิวในบทที่ 5</p>
+<h3>ไฟล์ food.html</h3>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/04-views-templates/app_foods/templates/app_foods/food.html" target="_blank" rel="noopener">app_foods/templates/app_foods/food.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;เมนู id = ___ - จันทร์ไรเดอร์ เมนูอร่อย ส่งบ่อย ส่งแม่น&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;รายละเอียดของเมนูนี้ id = __&lt;/h1&gt;
+    &lt;p&gt;อร่อยจนต้องต่อยรังแตน&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></figure>
+<p>ข้อความ <code>___</code> และ <code>__</code> เป็นที่ว่างไว้ใส่ชื่อเมนูและ id ในบทที่ 5</p>
+<h2>ขั้นตอนที่ 6 แก้วิวให้ใช้เทมเพลต</h2>
+<p>แทนที่เนื้อหาของไฟล์ <code>views.py</code> ทั้งสองด้วยโค้ดต่อไปนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/04-views-templates/app_general/views.py" target="_blank" rel="noopener">app_general/views.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.http.response import HttpResponse
+from django.shortcuts import render
+
+# Create your views here.
+def home(request):
+    return render(request, 'app_general/home.html')
+
+def about(request):
+    return render(request, 'app_general/about.html')</code></pre></figure>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/04-views-templates/app_foods/views.py" target="_blank" rel="noopener">app_foods/views.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.http.response import HttpResponse
+from django.shortcuts import render
+
+# Create your views here.
+def foods(request):
+    return render(request, 'app_foods/foods.html')
+
+def food(request, food_id):
+    return render(request, 'app_foods/food.html')</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>render(request, 'app_general/home.html')</code></td><td>ฟังก์ชัน <code>render</code> รับคำขอ (<code>request</code>) และชื่อไฟล์เทมเพลตเป็นพารามิเตอร์ แล้วคืนการตอบกลับที่สร้างจากเทมเพลตนั้น ชื่อไฟล์เริ่มนับจากโฟลเดอร์ <code>templates</code> จึงเป็น <code>app_general/home.html</code></td></tr>
+<tr><td><code>def food(request, food_id):</code></td><td>ยังคงรับ <code>food_id</code> ไว้ แต่ยังไม่ได้นำไปใช้ในบทนี้</td></tr>
+<tr><td><code>from django.http.response import HttpResponse</code></td><td>บรรทัดนี้ยังอยู่แต่ไม่ได้ใช้แล้ว ไม่ทำให้เกิดข้อผิดพลาด</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 7 เปิดเซิร์ฟเวอร์และทดสอบ</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py runserver</code></pre></figure>
+<p>ถ้าเซิร์ฟเวอร์จากบทที่ 3 ยังเปิดอยู่ เซิร์ฟเวอร์จะโหลดโค้ดใหม่เองเมื่อบันทึกไฟล์ <code>.py</code> หากไม่เห็นการเปลี่ยนแปลง ให้หยุดเซิร์ฟเวอร์ด้วย Ctrl และ C แล้วเปิดใหม่</p>
+<h2>ผลลัพธ์ที่ควรได้</h2>
+<table class="exp"><thead><tr><th>ที่อยู่</th><th>ผลที่เห็น</th></tr></thead><tbody>
+<tr><td><code>http://127.0.0.1:8000/</code></td><td>หน้า จันทร์ไรเดอร์ มีแถบสีเทาด้านบนที่มีลิงก์ 3 ลิงก์ ข้อความ เมนูอร่อย ส่งบ่อย ส่งแม่น และแถบสีเทาด้านล่างที่มีลิงก์ Facebook, Twitter, Instagram</td></tr>
+<tr><td><code>http://127.0.0.1:8000/about</code></td><td>หน้า เรื่องราวเกี่ยวกับจันทร์ไรเดอร์ มีหัวข้อ ก่อตั้ง และ คำมั่นสัญญา คั่นด้วยเส้นแนวนอน (ไม่มีแถบสีเทา)</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/</code></td><td>หน้า เมนูอร่อย ส่งบ่อย ส่งแม่น มีลิงก์ Red spicy และ Blue Iceberg</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/1 และตัวเลขอื่น</code></td><td>หน้า รายละเอียดของเมนูนี้ id = __ และข้อความ อร่อยจนต้องต่อยรังแตน ข้อความเหมือนกันทุกหมายเลข เพราะยังไม่ได้ส่งข้อมูลจากวิว</td></tr>
+<tr><td><code>แท็บของเบราว์เซอร์</code></td><td>แสดงข้อความในแท็ก <code>&lt;title&gt;</code> ของแต่ละหน้า</td></tr>
+</tbody></table>
+<h2>โครงสร้างไฟล์หลังจบบท</h2>
+<p>แสดงเฉพาะไฟล์ที่เพิ่มหรือแก้ในบทนี้ (+ คือไฟล์ที่สร้างใหม่, * คือไฟล์ที่แก้ไข)</p>
+<figure class="code"><figcaption><span>django-junraider/</span></figcaption><pre><code>django-junraider/
+├── app_foods/
+│   ├── templates/
+│   │   └── app_foods/
+│   │       ├── food.html     +
+│   │       └── foods.html    +
+│   └── views.py              *
+├── app_general/
+│   ├── templates/
+│   │   └── app_general/
+│   │       ├── about.html    +
+│   │       └── home.html     +
+│   └── views.py              *
+└── project_jrd/
+    └── settings.py           *</code></pre></figure>
+<div class="pager"><a href="ch03.html">&larr; บทก่อนหน้า: บทที่ 3</a><a href="ch05.html">บทถัดไป: บทที่ 5 &rarr;</a></div></main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

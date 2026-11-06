@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class=""><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class=""><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class=""><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class=""><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class=""><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class=""><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class="cur"><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class=""><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class=""><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class=""><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class=""><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class=""><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class=""><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class=""><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class=""><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class=""><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<p class="ch">บทที่ 6 จาก 15</p>
+<h1>ตัวกรองในเทมเพลต (templates x filters)</h1>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider/tree/06-templates-filters" target="_blank" rel="noopener">บรานช์ 06-templates-filters</a> · <a href="https://github.com/potchangelo/django-junraider/compare/05-templates-tags...06-templates-filters" target="_blank" rel="noopener">ส่วนที่เปลี่ยนจากบทก่อนหน้า</a></p>
+<h2>วัตถุประสงค์</h2>
+<p>เมื่อจบบทนี้ ผู้เรียนใช้ตัวกรอง (Filter) ของเทมเพลตจัดรูปแบบตัวเลขและวันที่ให้อ่านง่าย และตั้งค่าภาษาและเขตเวลาของโปรเจกต์เป็นภาษาไทยและเวลาประเทศไทยได้</p>
+<h2>ขั้นตอนที่ 1 ทำความเข้าใจตัวกรอง</h2>
+<p>ตัวกรอง (Filter) คือส่วนที่แปลงค่าของตัวแปรก่อนแสดงในเทมเพลต เขียนต่อท้ายตัวแปรด้วยเครื่องหมาย <code>|</code> เช่น <code>{{ food.price|floatformat:'g' }}</code> ถ้าตัวกรองรับพารามิเตอร์ ให้ใส่หลังเครื่องหมาย <code>:</code> ตามเอกสารของ Django ตัวกรองไม่เปลี่ยนค่าของตัวแปรในวิว เปลี่ยนเฉพาะสิ่งที่แสดงบนหน้าเว็บ</p>
+<h2>ขั้นตอนที่ 2 ตั้งค่าภาษาและเขตเวลา</h2>
+<p>เปิดไฟล์ <code>project_jrd/settings.py</code> หาสองบรรทัดนี้ในส่วน Internationalization แล้วแก้ค่า ซึ่งเดิมเป็น <code>'en-us'</code> และ <code>'UTC'</code></p>
+<figure class="code"><figcaption><span>project_jrd/settings.py (ส่วนที่แก้)</span><button type="button">คัดลอก</button></figcaption><pre><code>LANGUAGE_CODE = 'th'
+
+TIME_ZONE = 'Asia/Bangkok'</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>LANGUAGE_CODE = 'th'</code></td><td>ภาษาและรูปแบบการแสดงผลของโปรเจกต์ <code>th</code> คือภาษาไทย มีผลกับรูปแบบวันที่และข้อความของ Django เช่น ชื่อเดือนแบบย่อที่ตัวกรอง <code>date</code> แสดง</td></tr>
+<tr><td><code>TIME_ZONE = 'Asia/Bangkok'</code></td><td>เขตเวลาของโปรเจกต์ <code>Asia/Bangkok</code> คือเวลาประเทศไทย (UTC+7) ซึ่งเป็นชื่อเขตเวลาตามฐานข้อมูลเขตเวลา IANA</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 3 เปลี่ยนข้อมูลเมนูในวิว</h2>
+<p>แทนที่เนื้อหาของ <code>app_foods/views.py</code> ด้วยโค้ดนี้ ข้อมูลเมนูเพิ่มคีย์ <code>promotionEndAt</code> (วันที่สิ้นสุดโปรโมชั่น) และราคาเปลี่ยนเป็นหลักพัน เพื่อให้เห็นผลของการจัดรูปแบบ</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/06-templates-filters/app_foods/views.py" target="_blank" rel="noopener">app_foods/views.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from datetime import datetime
+from django.http.response import HttpResponse
+from django.shortcuts import render
+
+all_foods = [
+    {
+        'id': 1, 'title': 'Red Spicy', 'price': 2990, 'isPremium': False,
+        'promotionEndAt': datetime(2022, 1, 31)
+    },
+    {
+        'id': 2, 'title': 'Blue Iceberg', 'price': 2990, 'isPremium': False,
+        'promotionEndAt': datetime(2022, 2, 15)
+    },
+    {
+        'id': 3, 'title': 'Premium Black Choco', 'price': 3990, 'isPremium': True,
+        'promotionEndAt': datetime(2022, 2, 28)
+    },
+]
+
+# Create your views here.
+
+
+def foods(request):
+    context = {'foods': all_foods}
+    return render(request, 'app_foods/foods.html', context)
+
+
+def food(request, food_id):
+    one_food = None
+    try:
+        one_food = [f for f in all_foods if f['id'] == food_id][0]
+    except IndexError:
+        print('ไม่มีเธอ ไม่เจอ Index')
+    context = {'food': one_food}
+    return render(request, 'app_foods/food.html', context)</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>from datetime import datetime</code></td><td>นำคลาส <code>datetime</code> ของ Python ซึ่งเก็บวันที่และเวลาเข้ามาใช้</td></tr>
+<tr><td><code>'price': 2990</code></td><td>ราคาเปลี่ยนจาก 299 เป็น 2990 และจาก 399 เป็น 3990</td></tr>
+<tr><td><code>'promotionEndAt': datetime(2022, 1, 31)</code></td><td>คีย์ใหม่ที่เก็บวันที่สิ้นสุดโปรโมชั่น <code>datetime(2022, 1, 31)</code> คือวันที่ 31 มกราคม ค.ศ. 2022 โดยพารามิเตอร์เรียงเป็น ปี เดือน วัน</td></tr>
+</tbody></table>
+<p>ส่วนฟังก์ชัน <code>foods</code> และ <code>food</code> ด้านล่างไฟล์ไม่เปลี่ยนจากบทที่ 5</p>
+<h2>ขั้นตอนที่ 4 ใช้ตัวกรองในเทมเพลต</h2>
+<p>แทนที่เนื้อหาทั้งไฟล์ <code>foods.html</code> ด้วยโค้ดนี้ ส่วนที่เปลี่ยนคือ 2 บรรทัดในแท็ก <code>&lt;div&gt;</code> ของแต่ละเมนู ได้แก่ บรรทัดแสดงราคา และบรรทัดแสดงวันที่ที่เพิ่มใหม่</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/06-templates-filters/app_foods/templates/app_foods/foods.html" target="_blank" rel="noopener">app_foods/templates/app_foods/foods.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}เมนูอร่อยทั้งหมด - {% endblock %}
+
+{% block content %}
+&lt;h1&gt;เมนูอร่อย ส่งบ่อย ส่งแม่น&lt;/h1&gt;
+{% for food in foods %}
+    &lt;div style="background-color: rgb(255, 238, 231);"&gt;
+        &lt;h3&gt;&lt;a href="{% url 'food' food.id %}"&gt;{{ food.title }}&lt;/a&gt;&lt;/h3&gt;
+        {% if food.isPremium %}
+            &lt;p&gt;*** เมนูพิเศษสุด Premium&lt;/p&gt;
+        {% endif %}
+        &lt;p&gt;{{ food.price|floatformat:'g' }}&lt;/p&gt;
+        &lt;p&gt;โปรโมชั่นถึงวันที่ {{ food.promotionEndAt|date:'j N Y' }}&lt;/p&gt;
+    &lt;/div&gt;
+{% empty %}
+    &lt;p&gt;วัตถุดิบกำลังเดินทางมาจากทะเลอันไกลโพ้นนนน กรุณารอความอร่อยอีกไม่นาน&lt;/p&gt;
+{% endfor %}
+{% endblock %}</code></pre></figure>
+<p>แทนที่เนื้อหาทั้งไฟล์ <code>food.html</code> ด้วยโค้ดนี้ ส่วนที่เปลี่ยนเหมือนไฟล์ <code>foods.html</code></p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/06-templates-filters/app_foods/templates/app_foods/food.html" target="_blank" rel="noopener">app_foods/templates/app_foods/food.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}{{ food.title }} - {% endblock %}
+
+{% block content %}
+{% if food is not None %}
+    &lt;h1&gt;{{ food.title }}&lt;/h1&gt;
+    {% if food.isPremium %}
+        &lt;p&gt;*** เมนูพิเศษสุด Premium&lt;/p&gt;
+    {% endif %}
+    &lt;p&gt;{{ food.price|floatformat:'g' }}&lt;/p&gt;
+    &lt;p&gt;โปรโมชั่นถึงวันที่ {{ food.promotionEndAt|date:'j N Y' }}&lt;/p&gt;
+    &lt;p&gt;อร่อยจนต้องต่อยรังแตน&lt;/p&gt;
+{% else %}
+    &lt;p&gt;ไม่พบเมนู&lt;/p&gt;
+{% endif %}
+{% endblock %}</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>{{ food.price|floatformat:'g' }}</code></td><td>ตัวกรอง <code>floatformat</code> จัดรูปแบบตัวเลข พารามิเตอร์ <code>g</code> สั่งให้คั่นหลักพันด้วยเครื่องหมายจุลภาค ตามเอกสารของ Django เช่น 2990 แสดงเป็น 2,990</td></tr>
+<tr><td><code>{{ food.promotionEndAt|date:'j N Y' }}</code></td><td>ตัวกรอง <code>date</code> จัดรูปแบบวันที่ตามตัวอักษรรหัสใน <code>'j N Y'</code> โดย <code>j</code> คือวันที่ของเดือนไม่มีเลขศูนย์นำหน้า <code>N</code> คือชื่อเดือนแบบย่อ และ <code>Y</code> คือปีสี่หลัก ชื่อเดือนแสดงเป็นภาษาไทยเพราะตั้ง <code>LANGUAGE_CODE = 'th'</code></td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 5 เปิดเซิร์ฟเวอร์และทดสอบ</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py runserver</code></pre></figure>
+<h2>ผลลัพธ์ที่ควรได้</h2>
+<table class="exp"><thead><tr><th>ที่อยู่</th><th>ผลที่เห็น</th></tr></thead><tbody>
+<tr><td><code>http://127.0.0.1:8000/foods/</code></td><td>เมนู 3 รายการแสดงราคา 2,990 / 2,990 / 3,990 และข้อความ โปรโมชั่นถึงวันที่ 31 ม.ค. 2022, 15 ก.พ. 2022 และ 28 ก.พ. 2022 ตามลำดับ</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/3</code></td><td>แสดงราคา 3,990 และ โปรโมชั่นถึงวันที่ 28 ก.พ. 2022</td></tr>
+</tbody></table>
+<h2>โครงสร้างไฟล์หลังจบบท</h2>
+<p>แสดงเฉพาะไฟล์ที่เพิ่มหรือแก้ในบทนี้ (+ คือไฟล์ที่สร้างใหม่, * คือไฟล์ที่แก้ไข)</p>
+<figure class="code"><figcaption><span>django-junraider/</span></figcaption><pre><code>django-junraider/
+├── app_foods/
+│   ├── templates/
+│   │   └── app_foods/
+│   │       ├── food.html     *
+│   │       └── foods.html    *
+│   └── views.py              *
+└── project_jrd/
+    └── settings.py           *</code></pre></figure>
+<div class="pager"><a href="ch05.html">&larr; บทก่อนหน้า: บทที่ 5</a><a href="ch07.html">บทถัดไป: บทที่ 7 &rarr;</a></div></main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

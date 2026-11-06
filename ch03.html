@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 3 เส้นทางและวิว (urls x views)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class=""><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class=""><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class=""><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class="cur"><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class=""><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class=""><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class=""><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class=""><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class=""><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class=""><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class=""><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class=""><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class=""><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class=""><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class=""><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class=""><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<p class="ch">บทที่ 3 จาก 15</p>
+<h1>เส้นทางและวิว (urls x views)</h1>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider/tree/03-urls-views" target="_blank" rel="noopener">บรานช์ 03-urls-views</a> · <a href="https://github.com/potchangelo/django-junraider/compare/02-project-apps...03-urls-views" target="_blank" rel="noopener">ส่วนที่เปลี่ยนจากบทก่อนหน้า</a></p>
+<h2>วัตถุประสงค์</h2>
+<p>เมื่อจบบทนี้ ผู้เรียนเขียนวิว (View) และกำหนดเส้นทาง (URL) เพื่อให้เบราว์เซอร์เปิด 4 ที่อยู่ของเว็บได้ ได้แก่ หน้าแรก หน้าเกี่ยวกับ หน้ารายการเมนู และหน้ารายละเอียดเมนูตามหมายเลข</p>
+<h2>ขั้นตอนที่ 1 ทำความเข้าใจการทำงานของ URL และวิว</h2>
+<p>เมื่อผู้ใช้พิมพ์ที่อยู่ในเบราว์เซอร์ เบราว์เซอร์ส่งคำขอ (Request) ไปยังเซิร์ฟเวอร์ Django จะนำส่วนท้ายของที่อยู่ (เช่น <code>/about</code>) ไปเทียบกับรายการเส้นทางที่ประกาศไว้ เมื่อพบเส้นทางที่ตรงกัน จะเรียกวิวที่ผูกกับเส้นทางนั้น วิวคือฟังก์ชัน Python ที่รับคำขอแล้วคืนการตอบกลับ (Response) ให้เบราว์เซอร์แสดงผล</p>
+<p>ไฟล์ที่ประกาศรายการเส้นทางเรียกว่า URLconf ในบทนี้แต่ละแอปมีไฟล์ <code>urls.py</code> ของตนเอง และไฟล์ <code>project_jrd/urls.py</code> ของโปรเจกต์ทำหน้าที่รวมไฟล์เหล่านั้นเข้าด้วยกัน</p>
+<h2>ขั้นตอนที่ 2 เขียนวิวของ app_general</h2>
+<p>เปิดไฟล์ <code>app_general/views.py</code> ซึ่ง Django สร้างไว้แล้ว แทนที่เนื้อหาเดิมทั้งหมดด้วยโค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/03-urls-views/app_general/views.py" target="_blank" rel="noopener">app_general/views.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.http.response import HttpResponse
+from django.shortcuts import render
+
+# Create your views here.
+def home(request):
+    return HttpResponse('&lt;h1&gt;จันทร์ไรเดอร์&lt;/h1&gt;')
+
+def about(request):
+    return HttpResponse('เกี่ยวกับจันทร์ไรเดอร์')</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>from django.http.response import HttpResponse</code></td><td>นำคลาส <code>HttpResponse</code> เข้ามาใช้ คลาสนี้สร้างการตอบกลับที่มีข้อความตามที่กำหนด</td></tr>
+<tr><td><code>from django.shortcuts import render</code></td><td>นำฟังก์ชัน <code>render</code> เข้ามา บรรทัดนี้ Django สร้างไว้ให้ ยังไม่ได้ใช้ในบทนี้ และจะใช้ในบทที่ 4</td></tr>
+<tr><td><code># Create your views here.</code></td><td>คอมเมนต์ (Comment) ขึ้นต้นด้วย <code>#</code> Python ไม่นำไปทำงาน</td></tr>
+<tr><td><code>def home(request):</code></td><td>ประกาศฟังก์ชันวิวชื่อ <code>home</code> พารามิเตอร์ <code>request</code> คือคำขอที่ Django ส่งเข้ามา</td></tr>
+<tr><td><code>return HttpResponse('&lt;h1&gt;จันทร์ไรเดอร์&lt;/h1&gt;')</code></td><td>ส่งการตอบกลับเป็นข้อความ HTML ซึ่งเป็นภาษาที่ใช้กำหนดส่วนประกอบของหน้าเว็บ (อธิบายเพิ่มในบทที่ 4) โดย <code>&lt;h1&gt;</code> คือแท็ก (Tag) หัวข้อใหญ่ของ HTML เบราว์เซอร์จะแสดงข้อความ จันทร์ไรเดอร์ เป็นหัวข้อขนาดใหญ่</td></tr>
+<tr><td><code>def about(request):</code></td><td>ประกาศฟังก์ชันวิวชื่อ <code>about</code> สำหรับหน้าเกี่ยวกับ</td></tr>
+<tr><td><code>return HttpResponse('เกี่ยวกับจันทร์ไรเดอร์')</code></td><td>ส่งการตอบกลับเป็นข้อความธรรมดา</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 3 สร้าง urls.py ของ app_general</h2>
+<p>Django ไม่สร้างไฟล์ <code>urls.py</code> ให้ในแอป ให้สร้างไฟล์ใหม่ชื่อ <code>app_general/urls.py</code> ในโฟลเดอร์ <code>app_general</code> แล้วพิมพ์โค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/03-urls-views/app_general/urls.py" target="_blank" rel="noopener">app_general/urls.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.home, name='home'),
+    path('about', views.about, name='about'),
+]</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>from django.urls import path</code></td><td>นำฟังก์ชัน <code>path</code> ซึ่งใช้ประกาศหนึ่งเส้นทางเข้ามาใช้</td></tr>
+<tr><td><code>from . import views</code></td><td>นำไฟล์ <code>views.py</code> ในโฟลเดอร์เดียวกัน (แทนด้วยจุด) เข้ามาใช้ เพื่ออ้างถึงวิวที่เขียนไว้</td></tr>
+<tr><td><code>urlpatterns = [ ... ]</code></td><td>รายการเส้นทางของแอป Django ใช้ตัวแปรชื่อ <code>urlpatterns</code> นี้เท่านั้น จึงต้องตั้งชื่อตามนี้</td></tr>
+<tr><td><code>path('', views.home, name='home')</code></td><td>เส้นทางแรก: ข้อความว่าง <code>''</code> หมายถึงที่อยู่หลักของแอป ให้เรียกวิว <code>views.home</code> และตั้งชื่อเส้นทางว่า <code>home</code> ชื่อนี้ใช้อ้างถึงเส้นทางในบทที่ 5</td></tr>
+<tr><td><code>path('about', views.about, name='about')</code></td><td>เส้นทางที่สอง: ที่อยู่ <code>about</code> เรียกวิว <code>views.about</code> และตั้งชื่อว่า <code>about</code></td></tr>
+</tbody></table>
+<p><code>path</code> รับพารามิเตอร์ 3 ตัวตามลำดับ คือ รูปแบบเส้นทาง (Route) วิวที่จะเรียก และ <code>name</code> ชื่อของเส้นทาง</p>
+<h2>ขั้นตอนที่ 4 เขียนวิวของ app_foods</h2>
+<p>เปิดไฟล์ <code>app_foods/views.py</code> แล้วแทนที่เนื้อหาเดิมทั้งหมดด้วยโค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/03-urls-views/app_foods/views.py" target="_blank" rel="noopener">app_foods/views.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.http.response import HttpResponse
+from django.shortcuts import render
+
+# Create your views here.
+def foods(request):
+    return HttpResponse('เมนูอร่อย ส่งบ่อย ส่งแม่น By Junraider')
+
+def food(request, food_id):
+    return HttpResponse('รายละเอียดของเมนูนี้ id = ' + str(food_id))</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>def foods(request):</code></td><td>วิวสำหรับหน้ารายการเมนู ส่งข้อความธรรมดากลับ</td></tr>
+<tr><td><code>def food(request, food_id):</code></td><td>วิวสำหรับหน้ารายละเอียดเมนู มีพารามิเตอร์เพิ่ม <code>food_id</code> เพื่อรับหมายเลขเมนูจากเส้นทาง</td></tr>
+<tr><td><code>str(food_id)</code></td><td>แปลงจำนวนเต็ม <code>food_id</code> เป็นข้อความด้วยฟังก์ชัน <code>str</code> เพราะ Python ต่อข้อความกับจำนวนเต็มด้วยเครื่องหมาย <code>+</code> โดยตรงไม่ได้</td></tr>
+</tbody></table>
+<p>สองบรรทัด <code>import</code> ด้านบนของไฟล์มีความหมายเหมือนไฟล์ <code>app_general/views.py</code></p>
+<h2>ขั้นตอนที่ 5 สร้าง urls.py ของ app_foods</h2>
+<p>สร้างไฟล์ใหม่ชื่อ <code>app_foods/urls.py</code> แล้วพิมพ์โค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/03-urls-views/app_foods/urls.py" target="_blank" rel="noopener">app_foods/urls.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.foods, name='foods'),
+    path('&lt;int:food_id&gt;', views.food, name='food')
+]</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>path('', views.foods, name='foods')</code></td><td>เส้นทางหลักของแอป เรียกวิว <code>views.foods</code></td></tr>
+<tr><td><code>path('&lt;int:food_id&gt;', views.food, name='food')</code></td><td>เส้นทางที่มีส่วนแปรผัน ส่วน <code>&lt;int:food_id&gt;</code> รับค่าจากที่อยู่ โดย <code>int</code> คือพาธคอนเวอร์เตอร์ (Path Converter) ที่รับเฉพาะตัวเลขจำนวนเต็ม และ <code>food_id</code> คือชื่อพารามิเตอร์ที่ส่งให้วิว จึงต้องตรงกับพารามิเตอร์ของฟังก์ชัน <code>food</code></td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 6 รวมเส้นทางในไฟล์ urls.py ของโปรเจกต์</h2>
+<p>เปิดไฟล์ <code>project_jrd/urls.py</code> ส่วนบนของไฟล์เป็นข้อความอธิบายที่ Django สร้างให้ ไม่ต้องแก้ไข ให้แก้เฉพาะตั้งแต่บรรทัด <code>from django.contrib import admin</code> จนจบไฟล์ ให้เป็นดังนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/03-urls-views/project_jrd/urls.py" target="_blank" rel="noopener">project_jrd/urls.py (ส่วนที่แก้)</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('', include('app_general.urls')),
+    path('foods/', include('app_foods.urls')),
+    path('admin/', admin.site.urls),
+]</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>from django.urls import path, include</code></td><td>เพิ่มฟังก์ชัน <code>include</code> เข้ามา เดิมมีเฉพาะ <code>path</code></td></tr>
+<tr><td><code>path('', include('app_general.urls'))</code></td><td>ส่งที่อยู่ไปให้ไฟล์ <code>urls.py</code> ของ <code>app_general</code> พิจารณาก่อน ถ้าไม่ตรงกับเส้นทางใดในไฟล์นั้น Django จะตรวจรายการถัดไป</td></tr>
+<tr><td><code>path('foods/', include('app_foods.urls'))</code></td><td>ที่อยู่ที่ขึ้นต้นด้วย <code>foods/</code> ให้ตัดส่วน <code>foods/</code> ออก แล้วส่งส่วนที่เหลือไปให้ <code>urls.py</code> ของ <code>app_foods</code> พิจารณา เช่น <code>foods/1</code> จะเหลือ <code>1</code></td></tr>
+<tr><td><code>path('admin/', admin.site.urls)</code></td><td>เส้นทางของหน้าผู้ดูแลระบบที่ Django สร้างไว้ให้ ใช้ในบทที่ 11</td></tr>
+</tbody></table>
+<p>Django ตรวจเส้นทางจากบนลงล่างและใช้เส้นทางแรกที่ตรงกัน</p>
+<h2>ขั้นตอนที่ 7 เปิดเซิร์ฟเวอร์และทดสอบ</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py runserver</code></pre></figure>
+<p>เปิดเบราว์เซอร์แล้วทดสอบที่อยู่ต่อไปนี้ทีละที่อยู่</p>
+<h2>ผลลัพธ์ที่ควรได้</h2>
+<table class="exp"><thead><tr><th>ที่อยู่</th><th>ผลที่เห็น</th></tr></thead><tbody>
+<tr><td><code>http://127.0.0.1:8000/</code></td><td>แสดงข้อความ จันทร์ไรเดอร์ เป็นหัวข้อขนาดใหญ่</td></tr>
+<tr><td><code>http://127.0.0.1:8000/about</code></td><td>แสดงข้อความ เกี่ยวกับจันทร์ไรเดอร์</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/</code></td><td>แสดงข้อความ เมนูอร่อย ส่งบ่อย ส่งแม่น By Junraider</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/1</code></td><td>แสดงข้อความ รายละเอียดของเมนูนี้ id = 1</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/12</code></td><td>แสดงข้อความ รายละเอียดของเมนูนี้ id = 12 (ตัวเลขในที่อยู่ถูกส่งเข้าวิวเป็น <code>food_id</code>)</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/abc</code></td><td>แสดงหน้า Page not found (404) เพราะ <code>&lt;int:food_id&gt;</code> รับเฉพาะตัวเลข</td></tr>
+<tr><td><code>http://127.0.0.1:8000/about/</code></td><td>แสดงหน้า Page not found (404) เพราะเส้นทางที่ประกาศคือ <code>about</code> ไม่มีเครื่องหมาย <code>/</code> ท้ายที่อยู่</td></tr>
+</tbody></table>
+<h2>โครงสร้างไฟล์หลังจบบท</h2>
+<p>แสดงเฉพาะไฟล์ที่เพิ่มหรือแก้ในบทนี้ (+ คือไฟล์ที่สร้างใหม่, * คือไฟล์ที่แก้ไข)</p>
+<figure class="code"><figcaption><span>django-junraider/</span></figcaption><pre><code>django-junraider/
+├── app_foods/
+│   ├── urls.py      +
+│   └── views.py     *
+├── app_general/
+│   ├── urls.py      +
+│   └── views.py     *
+└── project_jrd/
+    └── urls.py      *</code></pre></figure>
+<div class="pager"><a href="ch02.html">&larr; บทก่อนหน้า: บทที่ 2</a><a href="ch04.html">บทถัดไป: บทที่ 4 &rarr;</a></div></main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

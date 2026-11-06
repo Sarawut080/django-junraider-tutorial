@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 5 แท็กในเทมเพลต (templates x tags)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class=""><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class=""><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class=""><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class=""><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class=""><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class="cur"><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class=""><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class=""><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class=""><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class=""><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class=""><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class=""><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class=""><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class=""><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class=""><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class=""><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<p class="ch">บทที่ 5 จาก 15</p>
+<h1>แท็กในเทมเพลต (templates x tags)</h1>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider/tree/05-templates-tags" target="_blank" rel="noopener">บรานช์ 05-templates-tags</a> · <a href="https://github.com/potchangelo/django-junraider/compare/04-views-templates...05-templates-tags" target="_blank" rel="noopener">ส่วนที่เปลี่ยนจากบทก่อนหน้า</a></p>
+<h2>วัตถุประสงค์</h2>
+<p>เมื่อจบบทนี้ ผู้เรียนใช้แท็ก (Tag) ของเทมเพลต ได้แก่ <code>extends</code>, <code>block</code>, <code>include</code>, <code>url</code>, <code>for</code>, <code>empty</code> และ <code>if</code> และส่งข้อมูลจากวิวไปแสดงในเทมเพลตได้ ทำให้ส่วนหัวและส่วนท้ายของเว็บอยู่ในไฟล์เดียวและรายการเมนูแสดงจากข้อมูลในวิว</p>
+<h2>ขั้นตอนที่ 1 ทำความเข้าใจภาษาของเทมเพลต</h2>
+<p>เทมเพลตของ Django เป็นไฟล์ HTML ที่แทรกไวยากรณ์พิเศษได้ 2 แบบ ตามเอกสารของ Django</p>
+<table class="exp"><thead><tr><th>ไวยากรณ์</th><th>ความหมาย</th></tr></thead><tbody>
+<tr><td><code>{{ ชื่อตัวแปร }}</code></td><td>ตัวแปร (Variable) คือค่าที่ส่งมาจากวิว Django นำค่านั้นมาแสดงแทนที่ตรงตำแหน่งนี้</td></tr>
+<tr><td><code>{% ชื่อแท็ก %}</code></td><td>แท็ก (Tag) คือคำสั่งของเทมเพลต ใช้ควบคุมการทำงาน เช่น ทำซ้ำ ตรวจเงื่อนไข หรือนำเทมเพลตอื่นมาใช้ แท็กบางชนิดต้องมีแท็กปิด เช่น <code>{% if %}</code> ต้องปิดด้วย <code>{% endif %}</code></td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 2 สร้างเทมเพลตฐาน base.html</h2>
+<p>บทที่ 4 ทุกหน้ามีโครงเอกสาร ส่วนหัว และส่วนท้ายซ้ำกัน ขั้นตอนนี้แยกส่วนที่ซ้ำไว้ในไฟล์กลาง สร้างโฟลเดอร์ <code>components</code> ใน <code>app_general/templates/app_general/</code> แล้วสร้างไฟล์ <code>base.html</code> ในโฟลเดอร์นั้น</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/05-templates-tags/app_general/templates/app_general/components/base.html" target="_blank" rel="noopener">app_general/templates/app_general/components/base.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;{% block site_title %}{% endblock %}จันทร์ไรเดอร์ เมนูอร่อย ส่งบ่อย ส่งแม่น&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    {% include 'app_general/components/site_header.html' %}
+    {% block content %}{% endblock %}
+    {% include 'app_general/components/site_footer.html' %}
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>{% block site_title %}{% endblock %}</code></td><td>ประกาศบล็อก (Block) ชื่อ <code>site_title</code> ซึ่งเป็นช่องว่างที่เทมเพลตอื่นเลือกเติมข้อความได้ ข้อความที่เติมจะอยู่หน้าคำว่า จันทร์ไรเดอร์ ในแท็ก <code>&lt;title&gt;</code></td></tr>
+<tr><td><code>{% include 'app_general/components/site_header.html' %}</code></td><td>แท็ก <code>include</code> นำเนื้อหาของไฟล์เทมเพลตอื่นมาใส่ตรงตำแหน่งนี้ ในที่นี้คือส่วนหัวของเว็บ</td></tr>
+<tr><td><code>{% block content %}{% endblock %}</code></td><td>ประกาศบล็อกชื่อ <code>content</code> เป็นช่องสำหรับเนื้อหาหลักของแต่ละหน้า</td></tr>
+<tr><td><code>{% include 'app_general/components/site_footer.html' %}</code></td><td>นำส่วนท้ายของเว็บมาใส่ตรงตำแหน่งนี้</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 3 สร้างส่วนหัวและส่วนท้าย</h2>
+<p>สร้างไฟล์ 2 ไฟล์ในโฟลเดอร์ <code>components</code> เดียวกัน</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/05-templates-tags/app_general/templates/app_general/components/site_header.html" target="_blank" rel="noopener">app_general/templates/app_general/components/site_header.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>&lt;header class="site-header" style="background-color: lightgray;"&gt;
+    &lt;a class="site-header-item site-header-brand" href="{% url 'home' %}"&gt;จันทร์ไรเดอร์&lt;/a&gt;
+    &lt;a class="site-header-item" href="{% url 'foods' %}"&gt;เมนูอร่อยทั้งหมด&lt;/a&gt;
+    &lt;a class="site-header-item" href="{% url 'about' %}"&gt;เกี่ยวกับ&lt;/a&gt;
+&lt;/header&gt;</code></pre></figure>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/05-templates-tags/app_general/templates/app_general/components/site_footer.html" target="_blank" rel="noopener">app_general/templates/app_general/components/site_footer.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>&lt;footer class="site-footer" style="background-color: lightgray;"&gt;
+    &lt;h4&gt;ติดตามความเคลื่อนไหวและโปรโมชั่นได้ที่&lt;/h4&gt;
+    &lt;p&gt;
+        &lt;a class="site-footer-item" href="#"&gt;Facebook&lt;/a&gt;
+        &lt;a class="site-header-item" href="#"&gt;Twitter&lt;/a&gt;
+        &lt;a class="site-header-item" href="#"&gt;Instagram&lt;/a&gt;
+    &lt;/p&gt;
+    &lt;p&gt;Copyright 2021-2022 Junraider. All right reserved.&lt;/p&gt;
+&lt;/footer&gt;</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>{% url 'home' %}</code></td><td>แท็ก <code>url</code> สร้างที่อยู่ของเส้นทางที่ตั้งชื่อ (<code>name</code>) ว่า <code>home</code> ไว้ใน <code>urls.py</code> ของบทที่ 3 ผลลัพธ์คือ <code>/</code></td></tr>
+<tr><td><code>{% url 'foods' %}</code></td><td>สร้างที่อยู่ของเส้นทางชื่อ <code>foods</code> ได้ <code>/foods/</code></td></tr>
+<tr><td><code>{% url 'about' %}</code></td><td>สร้างที่อยู่ของเส้นทางชื่อ <code>about</code> ได้ <code>/about</code></td></tr>
+</tbody></table>
+<p>ข้อดีของแท็ก <code>url</code> คือหากแก้รูปแบบเส้นทางใน <code>urls.py</code> ที่อยู่ในลิงก์จะเปลี่ยนตามเอง โดยไม่ต้องแก้ทุกเทมเพลต ส่วนท้ายไม่มีแท็กของเทมเพลต เป็น HTML ล้วนที่ย้ายมาจาก <code>home.html</code> ของบทที่ 4</p>
+<h2>ขั้นตอนที่ 4 ให้หน้า home และ about ใช้เทมเพลตฐาน</h2>
+<p>แทนที่เนื้อหาของไฟล์ทั้งสองด้วยโค้ดต่อไปนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/05-templates-tags/app_general/templates/app_general/home.html" target="_blank" rel="noopener">app_general/templates/app_general/home.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block content %}
+&lt;h1&gt;จันทร์ไรเดอร์&lt;/h1&gt;
+&lt;p&gt;เมนูอร่อย ส่งบ่อย ส่งแม่น&lt;/p&gt;
+&lt;p&gt;รอก่อน เดี๋ยวเจอ&lt;/p&gt;
+{% endblock %}</code></pre></figure>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/05-templates-tags/app_general/templates/app_general/about.html" target="_blank" rel="noopener">app_general/templates/app_general/about.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}เกี่ยวกับหมู่เฮา - {% endblock %}
+
+{% block content %}
+&lt;h1&gt;เรื่องราวเกี่ยวกับจันทร์ไรเดอร์&lt;/h1&gt;
+&lt;h4&gt;ก่อตั้ง&lt;/h4&gt;
+&lt;p&gt;2021&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4&gt;คำมั่นสัญญา&lt;/h4&gt;
+&lt;p&gt;นับแต่วันนี้เป็นต้นไป จะรักเธอจนกว่าแมนยูได้แชมป์พรีเมียร์ลีก&lt;/p&gt;
+{% endblock %}</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>{% extends 'app_general/components/base.html' %}</code></td><td>แท็ก <code>extends</code> บอกว่าเทมเพลตนี้สืบทอดจากเทมเพลตฐาน ต้องเป็นแท็กแรกของไฟล์ เนื้อหานอกบล็อกจะไม่ถูกแสดง</td></tr>
+<tr><td><code>{% block content %} ... {% endblock %}</code></td><td>เนื้อหาระหว่างแท็กนี้ถูกนำไปใส่ในบล็อก <code>content</code> ของ <code>base.html</code></td></tr>
+<tr><td><code>{% block site_title %}เกี่ยวกับหมู่เฮา - {% endblock %}</code></td><td>ใน <code>about.html</code> เติมข้อความในบล็อก <code>site_title</code> ทำให้ชื่อแท็บเป็น เกี่ยวกับหมู่เฮา - จันทร์ไรเดอร์ เมนูอร่อย ส่งบ่อย ส่งแม่น ส่วน <code>home.html</code> ไม่ได้เติม ชื่อแท็บจึงไม่มีข้อความนำหน้า</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 5 ส่งข้อมูลจากวิวไปยังเทมเพลต</h2>
+<p>แทนที่เนื้อหาของ <code>app_foods/views.py</code> ด้วยโค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/05-templates-tags/app_foods/views.py" target="_blank" rel="noopener">app_foods/views.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.http.response import HttpResponse
+from django.shortcuts import render
+
+all_foods = [
+    {'id': 1, 'title': 'Red Spicy', 'price': 299, 'isPremium': False},
+    {'id': 2, 'title': 'Blue Iceberg', 'price': 299, 'isPremium': False},
+    {'id': 3, 'title': 'Premium Black Choco', 'price': 399, 'isPremium': True},
+]
+
+# Create your views here.
+
+
+def foods(request):
+    context = {'foods': all_foods}
+    return render(request, 'app_foods/foods.html', context)
+
+
+def food(request, food_id):
+    one_food = None
+    try:
+        one_food = [f for f in all_foods if f['id'] == food_id][0]
+    except IndexError:
+        print('ไม่มีเธอ ไม่เจอ Index')
+    context = {'food': one_food}
+    return render(request, 'app_foods/food.html', context)</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>all_foods = [ {...}, {...}, {...} ]</code></td><td>ตัวแปร <code>all_foods</code> เป็นลิสต์ (List) ซึ่งเก็บข้อมูลเรียงกัน แต่ละสมาชิกเป็นดิกชันนารี (Dictionary) ซึ่งเก็บข้อมูลเป็นคู่ คีย์ : ค่า เช่น <code>'title': 'Red Spicy'</code> ข้อมูล 3 เมนูนี้แทนข้อมูลจริงชั่วคราว ก่อนใช้ฐานข้อมูลในบทที่ 7</td></tr>
+<tr><td><code>'isPremium': False</code></td><td>ค่าบูลีน (Boolean) บอกว่าเป็นเมนูพิเศษหรือไม่ โดย <code>True</code> คือใช่ <code>False</code> คือไม่ใช่</td></tr>
+<tr><td><code>context = {'foods': all_foods}</code></td><td>คอนเท็กซ์ (Context) คือดิกชันนารีที่ส่งไปเทมเพลต คีย์ <code>foods</code> กลายเป็นชื่อตัวแปร <code>foods</code> ในเทมเพลต</td></tr>
+<tr><td><code>render(request, 'app_foods/foods.html', context)</code></td><td>พารามิเตอร์ตัวที่สามของ <code>render</code> คือคอนเท็กซ์</td></tr>
+<tr><td><code>one_food = None</code></td><td>กำหนดค่าเริ่มต้นเป็น <code>None</code> ซึ่งหมายถึงยังไม่มีค่า</td></tr>
+<tr><td><code>[f for f in all_foods if f['id'] == food_id][0]</code></td><td>สร้างลิสต์ใหม่ที่มีเฉพาะเมนูซึ่ง <code>id</code> ตรงกับ <code>food_id</code> จากที่อยู่ (รูปแบบนี้เรียกว่า List Comprehension) แล้วเลือกสมาชิกลำดับที่ 0 คือตัวแรก</td></tr>
+<tr><td><code>try: ... except IndexError:</code></td><td>ลองทำคำสั่งใน <code>try</code> ถ้าไม่พบเมนู ลิสต์จะว่าง และการเลือกลำดับที่ 0 จะเกิดข้อผิดพลาดชนิด <code>IndexError</code> โปรแกรมจึงเข้าไปทำงานใน <code>except</code> แทนที่จะหยุดทำงาน</td></tr>
+<tr><td><code>print('ไม่มีเธอ ไม่เจอ Index')</code></td><td>แสดงข้อความในเทอร์มินัลที่รันเซิร์ฟเวอร์ ไม่แสดงบนหน้าเว็บ</td></tr>
+<tr><td><code>context = {'food': one_food}</code></td><td>ส่งเมนูที่พบ (หรือ <code>None</code> ถ้าไม่พบ) ไปเทมเพลตในชื่อ <code>food</code></td></tr>
+</tbody></table>
+<p>ไฟล์ <code>app_general/views.py</code> ไม่ต้องแก้ไข</p>
+<h2>ขั้นตอนที่ 6 แสดงรายการเมนูด้วย for, if และ empty</h2>
+<p>แทนที่เนื้อหาของ <code>foods.html</code> ด้วยโค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/05-templates-tags/app_foods/templates/app_foods/foods.html" target="_blank" rel="noopener">app_foods/templates/app_foods/foods.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}เมนูอร่อยทั้งหมด - {% endblock %}
+
+{% block content %}
+&lt;h1&gt;เมนูอร่อย ส่งบ่อย ส่งแม่น&lt;/h1&gt;
+{% for food in foods %}
+    &lt;div style="background-color: rgb(255, 238, 231);"&gt;
+        &lt;h3&gt;&lt;a href="{% url 'food' food.id %}"&gt;{{ food.title }}&lt;/a&gt;&lt;/h3&gt;
+        {% if food.isPremium %}
+            &lt;p&gt;*** เมนูพิเศษสุด Premium&lt;/p&gt;
+        {% endif %}
+        &lt;p&gt;{{ food.price }}&lt;/p&gt;
+    &lt;/div&gt;
+{% empty %}
+    &lt;p&gt;วัตถุดิบกำลังเดินทางมาจากทะเลอันไกลโพ้นนนน กรุณารอความอร่อยอีกไม่นาน&lt;/p&gt;
+{% endfor %}
+{% endblock %}</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>{% for food in foods %} ... {% empty %} ... {% endfor %}</code></td><td>แท็ก <code>for</code> วนซ้ำ (Loop) ทีละสมาชิกของ <code>foods</code> ที่วิวส่งมา โดยในแต่ละรอบตัวแปร <code>food</code> คือเมนูหนึ่งรายการ ส่วนระหว่าง <code>{% empty %}</code> กับ <code>{% endfor %}</code> จะแสดงเมื่อ <code>foods</code> ไม่มีสมาชิก</td></tr>
+<tr><td><code>{{ food.title }}</code></td><td>ตัวแปรที่ใช้เครื่องหมายจุดดึงค่าของคีย์ <code>title</code> ในดิกชันนารี</td></tr>
+<tr><td><code>{% url 'food' food.id %}</code></td><td>แท็ก <code>url</code> กับเส้นทางชื่อ <code>food</code> ซึ่งต้องการค่า <code>food_id</code> จึงส่ง <code>food.id</code> ตามหลังชื่อ ได้ที่อยู่ เช่น <code>/foods/1</code></td></tr>
+<tr><td><code>{% if food.isPremium %} ... {% endif %}</code></td><td>แสดงข้อความ *** เมนูพิเศษสุด Premium เมื่อค่าเป็นจริง (<code>True</code>)</td></tr>
+<tr><td><code>{{ food.price }}</code></td><td>แสดงราคา</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 7 แสดงรายละเอียดเมนู</h2>
+<p>แทนที่เนื้อหาของ <code>food.html</code> ด้วยโค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/05-templates-tags/app_foods/templates/app_foods/food.html" target="_blank" rel="noopener">app_foods/templates/app_foods/food.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}{{ food.title }} - {% endblock %}
+
+{% block content %}
+{% if food is not None %}
+    &lt;h1&gt;{{ food.title }}&lt;/h1&gt;
+    {% if food.isPremium %}
+        &lt;p&gt;*** เมนูพิเศษสุด Premium&lt;/p&gt;
+    {% endif %}
+    &lt;p&gt;{{ food.price }}&lt;/p&gt;
+    &lt;p&gt;อร่อยจนต้องต่อยรังแตน&lt;/p&gt;
+{% else %}
+    &lt;p&gt;ไม่พบเมนู&lt;/p&gt;
+{% endif %}
+{% endblock %}</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>{% block site_title %}{{ food.title }} - {% endblock %}</code></td><td>ใส่ชื่อเมนูหน้าชื่อแท็บของเบราว์เซอร์</td></tr>
+<tr><td><code>{% if food is not None %} ... {% else %} ... {% endif %}</code></td><td>ถ้า <code>food</code> มีค่า (ไม่ใช่ <code>None</code>) ให้แสดงรายละเอียด ถ้าไม่ใช่ให้แสดง ไม่พบเมนู จึงใช้แท็ก <code>else</code> แสดงข้อความทางเลือก</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 8 เปิดเซิร์ฟเวอร์และทดสอบ</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py runserver</code></pre></figure>
+<h2>ผลลัพธ์ที่ควรได้</h2>
+<table class="exp"><thead><tr><th>ที่อยู่</th><th>ผลที่เห็น</th></tr></thead><tbody>
+<tr><td><code>http://127.0.0.1:8000/ และ /about</code></td><td>ทุกหน้ามีแถบสีเทาด้านบนและด้านล่างเหมือนกัน หน้า about มีแถบสีเทาแล้ว ซึ่งบทที่ 4 ไม่มี ชื่อแท็บของหน้า about ขึ้นต้นด้วย เกี่ยวกับหมู่เฮา -</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/</code></td><td>แสดงเมนู 3 รายการ ได้แก่ Red Spicy 299, Blue Iceberg 299 และ Premium Black Choco 399 โดยเฉพาะรายการสุดท้ายมีข้อความ *** เมนูพิเศษสุด Premium และแต่ละชื่อเป็นลิงก์</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/3</code></td><td>แสดงชื่อ Premium Black Choco ข้อความ *** เมนูพิเศษสุด Premium ราคา 399 และ อร่อยจนต้องต่อยรังแตน ชื่อแท็บเป็น Premium Black Choco - จันทร์ไรเดอร์ เมนูอร่อย ส่งบ่อย ส่งแม่น</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/1</code></td><td>แสดงชื่อ Red Spicy ราคา 299 ไม่มีข้อความเมนูพิเศษ</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/99</code></td><td>แสดงข้อความ ไม่พบเมนู และเทอร์มินัลที่รันเซิร์ฟเวอร์แสดง ไม่มีเธอ ไม่เจอ Index</td></tr>
+</tbody></table>
+<h2>โครงสร้างไฟล์หลังจบบท</h2>
+<p>แสดงเฉพาะไฟล์ที่เพิ่มหรือแก้ในบทนี้ (+ คือไฟล์ที่สร้างใหม่, * คือไฟล์ที่แก้ไข)</p>
+<figure class="code"><figcaption><span>django-junraider/</span></figcaption><pre><code>django-junraider/
+├── app_foods/
+│   ├── templates/
+│   │   └── app_foods/
+│   │       ├── food.html            *
+│   │       └── foods.html           *
+│   └── views.py                     *
+└── app_general/
+    └── templates/
+        └── app_general/
+            ├── about.html           *
+            ├── home.html            *
+            └── components/
+                ├── base.html        +
+                ├── site_footer.html +
+                └── site_header.html +</code></pre></figure>
+<div class="pager"><a href="ch04.html">&larr; บทก่อนหน้า: บทที่ 4</a><a href="ch06.html">บทถัดไป: บทที่ 6 &rarr;</a></div></main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

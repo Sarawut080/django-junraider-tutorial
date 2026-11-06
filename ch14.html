@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class=""><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class=""><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class=""><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class=""><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class=""><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class=""><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class=""><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class=""><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class=""><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class=""><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class=""><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class=""><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class=""><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class=""><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class="cur"><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class=""><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<p class="ch">บทที่ 14 จาก 15</p>
+<h1>การตั้งค่าและไฟล์ .env (settings x dotenv)</h1>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider/tree/14-settings-dotenv" target="_blank" rel="noopener">บรานช์ 14-settings-dotenv</a> · <a href="https://github.com/potchangelo/django-junraider/compare/13-static-css-js...14-settings-dotenv" target="_blank" rel="noopener">ส่วนที่เปลี่ยนจากบทก่อนหน้า</a></p>
+<h2>วัตถุประสงค์</h2>
+<p>เมื่อจบบทนี้ ผู้เรียนย้ายค่าการตั้งค่าที่เป็นความลับและค่าที่ต่างกันตามเครื่อง ได้แก่ รหัสลับของ Django การเปิดโหมดแก้จุดบกพร่อง และข้อมูลเชื่อมต่อฐานข้อมูล ออกจากไฟล์ <code>settings.py</code> ไปไว้ในไฟล์ <code>.env</code> และอ่านค่าเหล่านั้นด้วย python-dotenv ได้</p>
+<h2>ขั้นตอนที่ 1 ทำความเข้าใจตัวแปรสภาพแวดล้อมและไฟล์ .env</h2>
+<ul>
+<li>ตัวแปรสภาพแวดล้อม (Environment Variable) คือค่าที่ระบบปฏิบัติการเก็บไว้ให้โปรแกรมอ่านได้ โดยแต่ละค่ามีชื่อและข้อความที่เป็นค่า Python อ่านได้ด้วย <code>os.getenv('ชื่อ')</code> ซึ่งคืนค่า <code>None</code> ถ้าไม่มีชื่อนั้น หรือคืนค่าที่กำหนดเป็นพารามิเตอร์ตัวที่สองถ้าไม่มี</li>
+<li>ไฟล์ <code>.env</code> คือไฟล์ข้อความที่เขียนค่าในรูป <code>ชื่อ=ค่า</code> บรรทัดละค่า แพ็กเกจ python-dotenv ช่วยอ่านไฟล์นี้แล้วตั้งเป็นตัวแปรสภาพแวดล้อมของโปรแกรม</li>
+<li>เหตุผลที่แยกค่าออกจากโค้ด คือรหัสลับและรหัสผ่านไม่ควรอยู่ในโค้ดที่แชร์หรืออัปโหลดขึ้น GitHub และแต่ละเครื่อง (เครื่องของผู้เรียนกับเซิร์ฟเวอร์จริงในบทที่ 15) ต้องใช้ค่าต่างกัน เปลี่ยนค่าได้โดยไม่ต้องแก้โค้ด</li>
+<li>ไฟล์ <code>.env</code> ต้องไม่ถูกอัปโหลดขึ้น GitHub ขั้นตอนที่ 5 สร้างไฟล์ <code>.gitignore</code> เพื่อกันไฟล์นี้ไว้</li>
+</ul>
+<h2>ขั้นตอนที่ 2 ติดตั้ง python-dotenv</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>pipenv install python-dotenv</code></pre></figure>
+<h2>ขั้นตอนที่ 3 สร้างไฟล์ .env</h2>
+<p>สร้างรหัสลับใหม่สำหรับโปรเจกต์ด้วยฟังก์ชันของ Django</p>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"</code></pre></figure>
+<p>คำสั่งนี้พิมพ์ข้อความสุ่มยาว 50 ตัวอักษร ให้คัดลอกไว้ใช้ในไฟล์ถัดไป จากนั้นสร้างไฟล์ชื่อ <code>.env</code> (ขึ้นต้นด้วยจุด ไม่มีชื่อก่อนจุด) ในโฟลเดอร์ <code>project_jrd</code> ข้างไฟล์ <code>settings.py</code> แล้วพิมพ์ค่าต่อไปนี้ โดยแทนที่ข้อความภายในเครื่องหมาย <code>&lt; &gt;</code> ด้วยค่าของผู้เรียนเอง</p>
+<figure class="code"><figcaption><span>project_jrd/.env</span><button type="button">คัดลอก</button></figcaption><pre><code>DEBUG=True
+SECRET_KEY='&lt;รหัสลับที่สร้างไว้&gt;'
+DB_NAME=django_junraider
+DB_USER=postgres
+DB_PASS=&lt;รหัสผ่านของผู้ใช้ postgres&gt;
+DB_HOST=127.0.0.1
+DB_PORT=5432</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>DEBUG=True</code></td><td>เปิดโหมดแก้จุดบกพร่อง (Debug Mode) ของ Django ซึ่งแสดงหน้าข้อผิดพลาดแบบละเอียด ใช้เฉพาะตอนพัฒนา</td></tr>
+<tr><td><code>SECRET_KEY='...'</code></td><td>รหัสลับที่ Django ใช้ลงลายเซ็นข้อมูล เช่น เซสชัน ต้องเก็บเป็นความลับ ครอบด้วยเครื่องหมายคำพูดเดี่ยวเพราะรหัสที่สุ่มมีเครื่องหมายพิเศษ เช่น <code>#</code> และ <code>$</code></td></tr>
+<tr><td><code>DB_NAME, DB_USER, DB_PASS, DB_HOST, DB_PORT</code></td><td>ข้อมูลเชื่อมต่อฐานข้อมูลที่เขียนไว้ใน <code>settings.py</code> ตั้งแต่บทที่ 7 ได้แก่ ชื่อฐานข้อมูล ชื่อผู้ใช้ รหัสผ่าน ที่อยู่เครื่อง และพอร์ต</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 4 สร้างไฟล์ .env.sample</h2>
+<p>ไฟล์ <code>.env</code> จะไม่ถูกอัปโหลดขึ้น GitHub ผู้ที่นำโปรเจกต์ไปใช้จึงไม่รู้ว่าต้องตั้งค่าอะไรบ้าง จึงควรมีไฟล์ตัวอย่างที่มีเฉพาะชื่อตัวแปรและค่าตัวอย่าง สร้างไฟล์ <code>project_jrd/.env.sample</code></p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/14-settings-dotenv/project_jrd/.env.sample" target="_blank" rel="noopener">project_jrd/.env.sample</a></span><button type="button">คัดลอก</button></figcaption><pre><code>DEBUG=True
+SECRET_KEY='your_secret_key_4321'
+DB_NAME=your_db_name
+DB_USER=your_db_user
+DB_PASS=your_db_pass
+DB_HOST=your_db_host
+DB_PORT=your_db_port</code></pre></figure>
+<p>ผู้ที่ดาวน์โหลดโปรเจกต์ไปใช้ ให้คัดลอกไฟล์นี้เป็น <code>.env</code> แล้วแก้ค่าให้ตรงกับเครื่องของตน</p>
+<h2>ขั้นตอนที่ 5 สร้างไฟล์ .gitignore</h2>
+<p>ไฟล์ <code>.gitignore</code> คือรายชื่อไฟล์และโฟลเดอร์ที่โปรแกรม Git (โปรแกรมบันทึกประวัติการแก้ไขโค้ดและส่งโค้ดขึ้น GitHub) ไม่นำไปบันทึกและไม่อัปโหลดขึ้น GitHub (ใช้ในบทที่ 15) สร้างไฟล์ชื่อ <code>.gitignore</code> ในโฟลเดอร์ <code>django-junraider</code> (ข้าง <code>manage.py</code>) แล้วพิมพ์รายการนี้</p>
+<figure class="code"><figcaption><span>.gitignore</span><button type="button">คัดลอก</button></figcaption><pre><code>__pycache__/
+*.pyc
+db.sqlite3
+.env
+.venv/</code></pre></figure>
+<table class="exp"><thead><tr><th>รายการ</th><th>เหตุผล</th></tr></thead><tbody>
+<tr><td><code>__pycache__/ และ *.pyc</code></td><td>โฟลเดอร์และไฟล์ที่ Python สร้างเองขณะรันโปรแกรม ไม่ต้องเก็บ</td></tr>
+<tr><td><code>db.sqlite3</code></td><td>ไฟล์ฐานข้อมูล SQLite ที่ Django สร้างขึ้นเมื่อรัน <code>runserver</code> ในบทที่ 1 (ก่อนเปลี่ยนเป็น PostgreSQL ในบทที่ 7)</td></tr>
+<tr><td><code>.env</code></td><td>ไฟล์ค่าลับของบทนี้ ต้องไม่อัปโหลด</td></tr>
+<tr><td><code>.venv/</code></td><td>โฟลเดอร์สภาพแวดล้อมเสมือน ถ้า pipenv สร้างไว้ในโฟลเดอร์โปรเจกต์</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 6 แก้ settings.py ให้อ่านค่าจาก .env</h2>
+<p>เปิดไฟล์ <code>project_jrd/settings.py</code> แล้วแก้ 3 ส่วน ส่วนแรกคือบรรทัด <code>import</code> ด้านบน เพิ่ม 3 รายการต่อจาก <code>from pathlib import Path</code></p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/14-settings-dotenv/project_jrd/settings.py" target="_blank" rel="noopener">project_jrd/settings.py (ส่วนที่เพิ่มใกล้ต้นไฟล์)</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+load_dotenv()</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>from dotenv import load_dotenv</code></td><td>นำฟังก์ชัน <code>load_dotenv</code> ของ python-dotenv เข้ามา</td></tr>
+<tr><td><code>import os</code></td><td>นำโมดูล <code>os</code> ของ Python ซึ่งมี <code>os.getenv</code> เข้ามา</td></tr>
+<tr><td><code>load_dotenv()</code></td><td>ค้นหาไฟล์ <code>.env</code> ในโฟลเดอร์เดียวกับไฟล์นี้ (และโฟลเดอร์ที่อยู่เหนือขึ้นไป) แล้วโหลดค่าเป็นตัวแปรสภาพแวดล้อม ต้องเรียกก่อนบรรทัดที่ใช้ <code>os.getenv</code></td></tr>
+</tbody></table>
+<p>ส่วนที่สองคือ <code>SECRET_KEY</code>, <code>DEBUG</code> และ <code>ALLOWED_HOSTS</code> แทนที่บรรทัดเดิมด้วยโค้ดนี้</p>
+<figure class="code"><figcaption><span>project_jrd/settings.py (ส่วนที่แก้)</span><button type="button">คัดลอก</button></figcaption><pre><code>SECRET_KEY = os.getenv('SECRET_KEY')
+
+DEBUG = os.getenv('DEBUG') == 'True'
+
+production_host = os.getenv('PRODUCTION_HOST')
+ALLOWED_HOSTS = [production_host] if production_host is not None else []</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>SECRET_KEY = os.getenv('SECRET_KEY')</code></td><td>อ่านรหัสลับจาก <code>.env</code> แทนข้อความที่ Django สร้างไว้ในไฟล์ (ขึ้นต้นด้วย <code>django-insecure-</code>)</td></tr>
+<tr><td><code>DEBUG = os.getenv('DEBUG') == 'True'</code></td><td>ตัวแปรสภาพแวดล้อมเป็นข้อความเสมอ จึงเทียบกับข้อความ <code>'True'</code> ได้ผลเป็นค่าบูลีน ถ้าไม่มีตัวแปรนี้หรือมีค่าอื่น <code>DEBUG</code> จะเป็น <code>False</code> ซึ่งเป็นค่าที่ปลอดภัยกว่า</td></tr>
+<tr><td><code>production_host = os.getenv('PRODUCTION_HOST')</code></td><td>อ่านชื่อโดเมน (Domain) ของเว็บบนเซิร์ฟเวอร์จริง โดเมนคือชื่อที่ใช้เรียกเว็บไซต์ เช่น <code>django-junraider.onrender.com</code> ตัวแปรนี้ไม่ต้องใส่ใน <code>.env</code> ของเครื่องตนเอง จะใช้ในบทที่ 15</td></tr>
+<tr><td><code>ALLOWED_HOSTS = [production_host] if ... else []</code></td><td><code>ALLOWED_HOSTS</code> คือรายชื่อโฮสต์ที่ Django ยอมรับคำขอ ถ้ามี <code>PRODUCTION_HOST</code> ใช้ค่านั้น ถ้าไม่มีใช้ลิสต์ว่าง ซึ่งเมื่อ <code>DEBUG</code> เป็น <code>True</code> Django ยอมรับ <code>localhost</code> และ <code>127.0.0.1</code> ให้เอง</td></tr>
+</tbody></table>
+<p>ส่วนที่สามคือ <code>DATABASES</code> แทนที่ค่าเดิมในบทที่ 7</p>
+<figure class="code"><figcaption><span>project_jrd/settings.py (ส่วนที่แก้)</span><button type="button">คัดลอก</button></figcaption><pre><code>DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', ''),
+        'USER': os.getenv('DB_USER', ''),
+        'PASSWORD': os.getenv('DB_PASS', ''),
+        'HOST': os.getenv('DB_HOST', ''),
+        'PORT': os.getenv('DB_PORT', ''),
+    }
+}</code></pre></figure>
+<p><code>ENGINE</code> ยังเป็นค่าคงที่ที่เขียนในไฟล์ ส่วนข้อมูลเชื่อมต่ออ่านจาก <code>.env</code> โดยพารามิเตอร์ตัวที่สอง <code>''</code> คือค่าที่ใช้เมื่อไม่มีตัวแปรนั้น</p>
+<h2>ขั้นตอนที่ 7 เปิดเซิร์ฟเวอร์และทดสอบ</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py runserver</code></pre></figure>
+<h2>ผลลัพธ์ที่ควรได้</h2>
+<ul>
+<li>เว็บทุกหน้าทำงานเหมือนบทที่ 13 และเชื่อมต่อฐานข้อมูลได้ แม้ค่าทั้งหมดมาจากไฟล์ <code>.env</code> ไม่ใช่ <code>settings.py</code></li>
+<li>ใน <code>settings.py</code> ไม่มีรหัสผ่านฐานข้อมูลและรหัสลับของ Django อยู่ในไฟล์</li>
+<li>ทดลองเปลี่ยน <code>DEBUG=False</code> ใน <code>.env</code> โดยไม่มี <code>PRODUCTION_HOST</code> เซิร์ฟเวอร์จะไม่เริ่มทำงานและแสดง <code>CommandError: You must set settings.ALLOWED_HOSTS if DEBUG is False.</code> หากเพิ่ม <code>PRODUCTION_HOST=127.0.0.1</code> เซิร์ฟเวอร์เริ่มได้ แต่สแตติกไฟล์ เช่น <code>/static/app_general/main.css</code> จะไม่ถูกส่ง (ตอบ 404) เพราะ <code>runserver</code> ส่งสแตติกไฟล์เฉพาะเมื่อ <code>DEBUG</code> เป็น <code>True</code> ซึ่งบทที่ 15 แก้ปัญหานี้ ทดลองเสร็จให้เปลี่ยนค่ากลับเป็น <code>DEBUG=True</code> และลบบรรทัด <code>PRODUCTION_HOST</code></li>
+</ul>
+<h2>โครงสร้างไฟล์หลังจบบท</h2>
+<p>แสดงเฉพาะไฟล์ที่เพิ่มหรือแก้ในบทนี้ (+ คือไฟล์ที่สร้างใหม่, * คือไฟล์ที่แก้ไข)</p>
+<figure class="code"><figcaption><span>django-junraider/</span></figcaption><pre><code>django-junraider/
+├── .gitignore               +
+├── Pipfile                  *
+├── Pipfile.lock             *
+└── project_jrd/
+    ├── .env                 +  (ไม่อัปโหลดขึ้น Git)
+    ├── .env.sample          +
+    └── settings.py          *</code></pre></figure>
+<div class="pager"><a href="ch13.html">&larr; บทก่อนหน้า: บทที่ 13</a><a href="ch15.html">บทถัดไป: บทที่ 15 &rarr;</a></div></main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

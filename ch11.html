@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 11 หน้าผู้ดูแลระบบ (admin)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class=""><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class=""><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class=""><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class=""><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class=""><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class=""><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class=""><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class=""><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class=""><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class=""><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class=""><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class="cur"><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class=""><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class=""><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class=""><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class=""><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<p class="ch">บทที่ 11 จาก 15</p>
+<h1>หน้าผู้ดูแลระบบ (admin)</h1>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider/tree/11-admin" target="_blank" rel="noopener">บรานช์ 11-admin</a> · <a href="https://github.com/potchangelo/django-junraider/compare/10-forms-views-templates...11-admin" target="_blank" rel="noopener">ส่วนที่เปลี่ยนจากบทก่อนหน้า</a></p>
+<h2>วัตถุประสงค์</h2>
+<p>เมื่อจบบทนี้ ผู้เรียนสร้างบัญชีผู้ดูแลระบบ เข้าสู่หน้าผู้ดูแลระบบ (Admin) ของ Django และลงทะเบียนโมเดลเพื่อดู ค้นหา กรอง เพิ่ม แก้ไข และลบข้อมูลเมนูและผู้ลงทะเบียนผ่านหน้าเว็บได้</p>
+<h2>ขั้นตอนที่ 1 ทำความเข้าใจหน้าผู้ดูแลระบบ</h2>
+<p>ตามเอกสารของ Django หน้าผู้ดูแลระบบ (Admin Site) คือหน้าเว็บสำหรับจัดการข้อมูลที่ Django สร้างให้จากโมเดลโดยอัตโนมัติ โปรเจกต์มีเส้นทาง <code>admin/</code> และแอป <code>django.contrib.admin</code> ตั้งแต่บทที่ 1 แล้ว สิ่งที่ต้องทำคือสร้างบัญชีผู้ดูแลและลงทะเบียนโมเดลที่ต้องการ</p>
+<h2>ขั้นตอนที่ 2 สร้างบัญชีผู้ดูแลระบบ</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py createsuperuser</code></pre></figure>
+<p>คำสั่งนี้ถามข้อมูลทีละบรรทัดในเทอร์มินัล ดังตาราง ป้ายคำถามบางบรรทัดเป็นภาษาไทยเพราะตั้ง <code>LANGUAGE_CODE = 'th'</code> ไว้ในบทที่ 6</p>
+<table class="exp"><thead><tr><th>ข้อความที่เทอร์มินัลถาม</th><th>สิ่งที่ต้องทำ</th></tr></thead><tbody>
+<tr><td><code>ชื่อผู้ใช้ (leave blank to use '...'):</code></td><td>พิมพ์ชื่อผู้ใช้ที่ใช้เข้าสู่ระบบ เช่น <code>admin</code> ถ้ากด Enter โดยไม่พิมพ์ จะใช้ชื่อในวงเล็บ</td></tr>
+<tr><td><code>ที่อยู่อีเมล:</code></td><td>พิมพ์อีเมล หรือกด Enter เพื่อเว้นว่าง</td></tr>
+<tr><td><code>Password:</code></td><td>พิมพ์รหัสผ่าน ขณะพิมพ์เทอร์มินัลจะไม่แสดงตัวอักษร</td></tr>
+<tr><td><code>Password (again):</code></td><td>พิมพ์รหัสผ่านเดิมอีกครั้ง</td></tr>
+<tr><td><code>Bypass password validation and create user anyway? [y/N]:</code></td><td>ขึ้นเฉพาะเมื่อรหัสผ่านไม่ผ่านเกณฑ์ เช่น This password is too short. หรือ This password is too common. ให้พิมพ์ <code>N</code> แล้วตั้งรหัสผ่านใหม่ที่ยาวอย่างน้อย 8 ตัวอักษรและคาดเดาได้ยาก</td></tr>
+</tbody></table>
+<p>ผู้ใช้ประเภท Superuser มีสิทธิ์จัดการข้อมูลทุกอย่างในหน้าผู้ดูแลระบบ</p>
+
+<figure class="code out"><figcaption><span>ผลลัพธ์เมื่อสร้างสำเร็จ</span></figcaption><pre><code>Superuser created successfully.</code></pre></figure>
+<h2>ขั้นตอนที่ 3 ปรับโมเดลให้ใช้กับหน้าผู้ดูแลระบบ</h2>
+<p>แทนที่เนื้อหาทั้งไฟล์ <code>app_foods/models.py</code> ด้วยโค้ดนี้ (ส่วนที่เปลี่ยนคือเพิ่ม <code>blank=True</code> ในสามฟิลด์ และเพิ่มเมธอด <code>__str__</code>)</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/11-admin/app_foods/models.py" target="_blank" rel="noopener">app_foods/models.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.db import models
+
+# Create your models here.
+
+class Food(models.Model):
+    title = models.CharField(max_length=60)
+    price = models.IntegerField()
+    special_price = models.IntegerField(null=True, blank=True)
+    is_premium = models.BooleanField(default=False)
+    promotion_end_at = models.DateTimeField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+
+    def __str__(self) -&gt; str:
+        return '{} (id: {})'.format(self.title, self.id)</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>blank=True</code></td><td>อนุญาตให้เว้นว่างได้ในฟอร์ม ต่างจาก <code>null=True</code> ที่อนุญาตให้ฐานข้อมูลเก็บค่า NULL ตามเอกสารของ Django <code>null</code> เกี่ยวกับฐานข้อมูล ส่วน <code>blank</code> เกี่ยวกับการตรวจสอบในฟอร์ม หากไม่ใส่ <code>blank=True</code> หน้าผู้ดูแลระบบจะบังคับให้กรอกช่องนั้น</td></tr>
+<tr><td><code>def __str__(self) -&gt; str:</code></td><td>เมธอดพิเศษของคลาส Python ที่กำหนดข้อความแทนออบเจกต์ ใช้แสดงชื่อรายการในหน้าผู้ดูแลระบบและใน Shell แทน <code>Food object (1)</code></td></tr>
+<tr><td><code>'{} (id: {})'.format(self.title, self.id)</code></td><td>สร้างข้อความโดยแทน <code>{}</code> ด้วยค่า <code>self.title</code> และ <code>self.id</code> ตามลำดับ ได้รูปแบบ เช่น Red Spicy (id: 1)</td></tr>
+</tbody></table>
+<p>แทนที่เนื้อหาทั้งไฟล์ <code>app_general/models.py</code> ด้วยโค้ดนี้ (ส่วนที่เปลี่ยนคือเพิ่มเมธอด <code>__str__</code> ท้ายคลาส <code>Subscription</code>)</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/11-admin/app_general/models.py" target="_blank" rel="noopener">app_general/models.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.db import models
+
+# Create your models here.
+
+class Subscription(models.Model):
+    STATUS = [
+        ('unapproved', 'Unapproved'),
+        ('banned', 'Banned'),
+        ('approved', 'Approved')
+    ]
+
+    name = models.CharField(max_length=50)
+    email = models.EmailField(max_length=50, unique=True)
+    status = models.CharField(max_length=15, choices=STATUS, default='unapproved')
+    registered_at = models.DateTimeField(auto_now_add=True)
+    food_set = models.ManyToManyField('app_foods.Food')
+
+    def __str__(self) -&gt; str:
+        return '{} (id={})'.format(self.name, self.id)</code></pre></figure>
+<h2>ขั้นตอนที่ 4 สร้างไมเกรชันของการเปลี่ยน blank</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py makemigrations
+python manage.py migrate</code></pre></figure>
+<figure class="code out"><figcaption><span>ผลลัพธ์ที่ควรเห็น</span></figcaption><pre><code>Migrations for 'app_foods':
+  app_foods\migrations\0002_alter_food_description_alter_food_promotion_end_at_and_more.py
+    - Alter field description on food
+    - Alter field promotion_end_at on food
+    - Alter field special_price on food
+
+Operations to perform:
+  Apply all migrations: admin, app_foods, app_general, auth, contenttypes, sessions
+Running migrations:
+  Applying app_foods.0002_alter_food_description_alter_food_promotion_end_at_and_more... OK</code></pre></figure>
+<p>แม้ <code>blank=True</code> ไม่เปลี่ยนตารางในฐานข้อมูล Django ก็ยังสร้างไมเกรชันเพื่อบันทึกการเปลี่ยนแปลงของโมเดล ส่วน <code>__str__</code> ไม่ต้องทำไมเกรชัน</p>
+<h2>ขั้นตอนที่ 5 ลงทะเบียนโมเดลในหน้าผู้ดูแลระบบ</h2>
+<p>แทนที่เนื้อหาของ <code>app_foods/admin.py</code> และ <code>app_general/admin.py</code> ด้วยโค้ดต่อไปนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/11-admin/app_foods/admin.py" target="_blank" rel="noopener">app_foods/admin.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.contrib import admin
+from app_foods.models import Food
+
+# Register your models here.
+
+class FoodAdmin(admin.ModelAdmin):
+    list_display = ['title', 'price', 'special_price', 'is_premium', 'promotion_end_at']
+    search_fields = ['title']
+    list_filter = ['is_premium']
+
+admin.site.register(Food, FoodAdmin)</code></pre></figure>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/11-admin/app_general/admin.py" target="_blank" rel="noopener">app_general/admin.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.contrib import admin
+from app_general.models import Subscription
+
+# Register your models here.
+
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ['name', 'email', 'status', 'registered_at']
+    search_fields = ['name', 'email']
+    list_filter = ['status']
+
+admin.site.register(Subscription, SubscriptionAdmin)</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>from app_foods.models import Food</code></td><td>นำโมเดลเข้ามาเพื่อลงทะเบียน</td></tr>
+<tr><td><code>class FoodAdmin(admin.ModelAdmin):</code></td><td>คลาสที่กำหนดการแสดงผลของโมเดลในหน้าผู้ดูแลระบบ สืบทอดจาก <code>admin.ModelAdmin</code></td></tr>
+<tr><td><code>list_display = [...]</code></td><td>รายการฟิลด์ที่แสดงเป็นคอลัมน์ในหน้ารายการ</td></tr>
+<tr><td><code>search_fields = ['title']</code></td><td>ฟิลด์ที่ค้นหาได้ ทำให้มีช่องค้นหาในหน้ารายการ</td></tr>
+<tr><td><code>list_filter = ['is_premium']</code></td><td>ฟิลด์ที่ใช้กรอง ทำให้มีแถบตัวกรองด้านขวา</td></tr>
+<tr><td><code>admin.site.register(Food, FoodAdmin)</code></td><td>ลงทะเบียนโมเดล <code>Food</code> กับหน้าผู้ดูแลระบบ โดยใช้การตั้งค่าจาก <code>FoodAdmin</code></td></tr>
+<tr><td><code>class SubscriptionAdmin</code></td><td>ทำเช่นเดียวกันกับโมเดล <code>Subscription</code> ซึ่งตัวกรองใช้ฟิลด์ <code>status</code></td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 6 เปิดเซิร์ฟเวอร์และใช้งานหน้าผู้ดูแลระบบ</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py runserver</code></pre></figure>
+<ul>
+<li>เปิด <code>http://127.0.0.1:8000/admin/</code> หน้าเข้าสู่ระบบมีช่อง ชื่อผู้ใช้ และ รหัสผ่าน ให้กรอกค่าที่สร้างในขั้นตอนที่ 2 แล้วกดปุ่ม เข้าสู่ระบบ</li>
+<li>หน้า การจัดการไซต์ มีหัวข้อแอป App_Foods (รายการ Foods) และ App_General (รายการ Subscriptions) รวมกับหัวข้อ การตรวจสอบและอนุมัติ ที่มากับ Django</li>
+<li>คลิก Foods เพื่อดูรายการเมนู พิมพ์ <code>choco</code> ในช่องด้านบนแล้วกดปุ่ม ค้นหา และเลือกตัวกรองทางขวา (หัวข้อ ตัวกรอง > โดย is premium > ใช่ หรือ ไม่ใช่)</li>
+<li>คลิกชื่อเมนูหนึ่งรายการเพื่อแก้ไขข้อมูล แล้วกดปุ่ม บันทึก</li>
+<li>ปุ่ม เพิ่ม food ที่มุมขวาบนของหน้ารายการใช้เพิ่มเมนูใหม่ และปุ่ม ลบ ในหน้าแก้ไขใช้ลบเมนู</li>
+</ul>
+<h2>ผลลัพธ์ที่ควรได้</h2>
+<ul>
+<li>เข้าสู่ระบบสำเร็จและเห็นหน้า การจัดการไซต์ ของ Django</li>
+<li>หน้ารายการ Foods มีคอลัมน์ Title, Price, Special price, Is premium, Promotion end at และเมนูทั้ง 5 รายการ</li>
+<li>ค้นหา <code>choco</code> เหลือ Dark Choco Premium และ White Choco Premium</li>
+<li>หน้าแก้ไขเมนูแสดงชื่อในรูปแบบ ชื่อ (id: ตัวเลข) เช่น Red Spicy (id: 1) ตามเมธอด <code>__str__</code></li>
+<li>แก้ไขเมนูแล้วบันทึกได้โดยไม่ต้องกรอกช่องที่ตั้ง <code>blank=True</code> (Special price, Promotion end at, Description)</li>
+<li>หน้าเว็บบทที่ 9 (เช่น <code>/foods/</code>) แสดงข้อมูลที่แก้ในหน้าผู้ดูแลระบบทันที</li>
+</ul>
+<h2>โครงสร้างไฟล์หลังจบบท</h2>
+<p>แสดงเฉพาะไฟล์ที่เพิ่มหรือแก้ในบทนี้ (+ คือไฟล์ที่สร้างใหม่, * คือไฟล์ที่แก้ไข)</p>
+<figure class="code"><figcaption><span>django-junraider/</span></figcaption><pre><code>django-junraider/
+├── app_foods/
+│   ├── admin.py                                                      *
+│   ├── migrations/
+│   │   └── 0002_alter_food_description_alter_food_promotion_end_at_and_more.py   +
+│   └── models.py                                                     *
+└── app_general/
+    ├── admin.py                                                      *
+    └── models.py                                                     *</code></pre></figure>
+<div class="pager"><a href="ch10.html">&larr; บทก่อนหน้า: บทที่ 10</a><a href="ch12.html">บทถัดไป: บทที่ 12 &rarr;</a></div></main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

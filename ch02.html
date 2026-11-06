@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class=""><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class=""><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class="cur"><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class=""><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class=""><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class=""><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class=""><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class=""><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class=""><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class=""><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class=""><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class=""><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class=""><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class=""><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class=""><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class=""><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<p class="ch">บทที่ 2 จาก 15</p>
+<h1>โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</h1>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider/tree/02-project-apps" target="_blank" rel="noopener">บรานช์ 02-project-apps</a> · <a href="https://github.com/potchangelo/django-junraider/compare/01-setup...02-project-apps" target="_blank" rel="noopener">ส่วนที่เปลี่ยนจากบทก่อนหน้า</a></p>
+<h2>วัตถุประสงค์</h2>
+<p>เมื่อจบบทนี้ ผู้เรียนอธิบายความต่างระหว่างโปรเจกต์ (Project) กับแอปพลิเคชัน (Application) ของ Django ได้ และสร้างแอปพลิเคชันชื่อ <code>app_general</code> และ <code>app_foods</code> ได้</p>
+<h2>ขั้นตอนที่ 1 ทำความเข้าใจโปรเจกต์และแอปพลิเคชัน</h2>
+<p>ตามเอกสารของ Django โปรเจกต์คือชุดของการตั้งค่าและแอปพลิเคชันสำหรับเว็บไซต์หนึ่งแห่ง ส่วนแอปพลิเคชัน (เรียกสั้นว่า แอป) คือส่วนของเว็บที่ทำหน้าที่เฉพาะอย่างหนึ่ง โปรเจกต์หนึ่งมีได้หลายแอป และแอปหนึ่งนำไปใช้ในหลายโปรเจกต์ได้</p>
+<p>โปรเจกต์นี้แบ่งเป็น 2 แอป ดังนี้</p>
+<table class="exp"><thead><tr><th>แอป</th><th>หน้าที่ในโปรเจกต์นี้</th></tr></thead><tbody>
+<tr><td><code>app_general</code></td><td>หน้าทั่วไปของเว็บ ได้แก่ หน้าแรกและหน้าเกี่ยวกับ</td></tr>
+<tr><td><code>app_foods</code></td><td>หน้าที่เกี่ยวกับรายการอาหาร ได้แก่ หน้ารายการเมนูและหน้ารายละเอียดเมนู</td></tr>
+</tbody></table>
+<p>ก่อนทำขั้นตอนถัดไป ให้เปิดเทอร์มินัลในโฟลเดอร์ <code>django-junraider</code> และเข้าสู่สภาพแวดล้อมเสมือนด้วย <code>pipenv shell</code> ตามขั้นตอนที่ 5 ของบทที่ 1 หากเซิร์ฟเวอร์จากบทที่ 1 ยังเปิดอยู่ ให้หยุดด้วย Ctrl และ C ก่อน</p>
+<h2>ขั้นตอนที่ 2 สร้างแอป app_general</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py startapp app_general</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>python manage.py</code></td><td>เรียก <code>manage.py</code> ด้วย Python เพื่อสั่งงานโปรเจกต์</td></tr>
+<tr><td><code>startapp</code></td><td>คำสั่งย่อยสร้างแอปใหม่ ซึ่งคือโฟลเดอร์ที่มีไฟล์พื้นฐานของแอป</td></tr>
+<tr><td><code>app_general</code></td><td>ชื่อแอป ใช้เป็นชื่อโฟลเดอร์ของแอปด้วย</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 3 สร้างแอป app_foods</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py startapp app_foods</code></pre></figure>
+<p>คำสั่งนี้ทำงานเหมือนขั้นตอนที่ 2 แต่ใช้ชื่อแอปเป็น <code>app_foods</code></p>
+<h2>ขั้นตอนที่ 4 ตรวจสอบไฟล์ที่ Django สร้างให้</h2>
+<p>แต่ละแอปมีโฟลเดอร์ของตนเอง และมีไฟล์เหมือนกันดังตารางต่อไปนี้ ในบทนี้ยังไม่ต้องแก้ไขไฟล์ใด</p>
+<table class="exp"><thead><tr><th>ไฟล์ / โฟลเดอร์</th><th>หน้าที่</th></tr></thead><tbody>
+<tr><td><code>__init__.py</code></td><td>ไฟล์ว่างที่บอก Python ว่าโฟลเดอร์นี้เป็นแพ็กเกจของ Python</td></tr>
+<tr><td><code>admin.py</code></td><td>ใช้ลงทะเบียนโมเดลเพื่อแสดงในหน้าผู้ดูแลระบบ (Admin) ใช้ในบทที่ 11</td></tr>
+<tr><td><code>apps.py</code></td><td>เก็บคลาส (Class) ที่ตั้งค่าของแอป</td></tr>
+<tr><td><code>migrations/</code></td><td>โฟลเดอร์เก็บไมเกรชัน (Migration) ซึ่งเป็นบันทึกการเปลี่ยนแปลงโครงสร้างฐานข้อมูล ใช้ในบทที่ 7</td></tr>
+<tr><td><code>models.py</code></td><td>ใช้ประกาศโมเดล (Model) ซึ่งกำหนดโครงสร้างข้อมูลที่เก็บในฐานข้อมูล ใช้ในบทที่ 7 และ 8</td></tr>
+<tr><td><code>tests.py</code></td><td>ใช้เขียนการทดสอบอัตโนมัติ (Test) ของแอป ไม่ได้ใช้ในชุดบทเรียนนี้</td></tr>
+<tr><td><code>views.py</code></td><td>ใช้เขียนวิว (View) ซึ่งเป็นฟังก์ชันที่รับคำขอของผู้ใช้และส่งผลลัพธ์กลับ ใช้ในบทที่ 3</td></tr>
+</tbody></table>
+<p>ไฟล์ <code>apps.py</code> ของแต่ละแอปมีเนื้อหาดังนี้ ซึ่งเป็นโค้ดที่ Django สร้างให้ ไม่ต้องพิมพ์เอง</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/02-project-apps/app_general/apps.py" target="_blank" rel="noopener">app_general/apps.py</a></span></figcaption><pre><code>from django.apps import AppConfig
+
+
+class AppGeneralConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'app_general'</code></pre></figure>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/02-project-apps/app_foods/apps.py" target="_blank" rel="noopener">app_foods/apps.py</a></span></figcaption><pre><code>from django.apps import AppConfig
+
+
+class AppFoodsConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'app_foods'</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>from django.apps import AppConfig</code></td><td>นำคลาส <code>AppConfig</code> จาก Django เข้ามาใช้</td></tr>
+<tr><td><code>class AppGeneralConfig(AppConfig):</code></td><td>สร้างคลาสการตั้งค่าของแอป โดยรับคุณสมบัติจาก <code>AppConfig</code> (ในไฟล์ของ <code>app_foods</code> ชื่อคลาสคือ <code>AppFoodsConfig</code>)</td></tr>
+<tr><td><code>default_auto_field = 'django.db.models.BigAutoField'</code></td><td>กำหนดชนิดของคอลัมน์ id ที่ Django สร้างให้อัตโนมัติในแต่ละโมเดลเป็นจำนวนเต็มขนาดใหญ่ (BigAutoField) รายละเอียดอยู่ในบทที่ 7</td></tr>
+<tr><td><code>name = 'app_general'</code></td><td>ชื่อแอป ต้องตรงกับชื่อโฟลเดอร์ของแอป</td></tr>
+</tbody></table>
+<p>แอปที่สร้างแล้วยังไม่ถูกลงทะเบียนในโปรเจกต์ ผู้เรียนจะลงทะเบียนในบทที่ 4</p>
+<h2>ผลลัพธ์ที่ควรได้</h2>
+<ul>
+<li>คำสั่ง <code>startapp</code> ทั้งสองคำสั่งไม่แสดงข้อความใดในเทอร์มินัล</li>
+<li>มีโฟลเดอร์ <code>app_general</code> และ <code>app_foods</code> ปรากฏข้าง <code>manage.py</code> โดยแต่ละโฟลเดอร์มีไฟล์ตามตารางในขั้นตอนที่ 4</li>
+</ul>
+<h2>โครงสร้างไฟล์หลังจบบท</h2>
+<p>แสดงเฉพาะไฟล์ที่เพิ่มในบทนี้</p>
+<figure class="code"><figcaption><span>django-junraider/</span></figcaption><pre><code>django-junraider/
+├── app_foods/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── migrations/
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── tests.py
+│   └── views.py
+└── app_general/
+    ├── __init__.py
+    ├── admin.py
+    ├── apps.py
+    ├── migrations/
+    │   └── __init__.py
+    ├── models.py
+    ├── tests.py
+    └── views.py</code></pre></figure>
+<div class="pager"><a href="ch01.html">&larr; บทก่อนหน้า: บทที่ 1</a><a href="ch03.html">บทถัดไป: บทที่ 3 &rarr;</a></div></main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class=""><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class=""><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class=""><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class=""><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class=""><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class=""><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class=""><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class=""><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class=""><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class=""><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class=""><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class=""><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class=""><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class=""><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class=""><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class="cur"><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<p class="ch">บทที่ 15 จาก 15</p>
+<h1>การนำขึ้นใช้งานจริง (Deploy)</h1>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider/tree/15-deploy-heroku" target="_blank" rel="noopener">บรานช์ 15-deploy-heroku</a> · <a href="https://github.com/potchangelo/django-junraider/compare/14-settings-dotenv...15-deploy-heroku" target="_blank" rel="noopener">ส่วนที่เปลี่ยนจากบทก่อนหน้า</a></p>
+<h2>วัตถุประสงค์</h2>
+<p>เมื่อจบบทนี้ ผู้เรียนเตรียมโปรเจกต์สำหรับการนำขึ้นใช้งานจริง (Deploy) และนำเว็บ จันทร์ไรเดอร์ ขึ้นให้ผู้อื่นเปิดผ่านอินเทอร์เน็ตได้บนบริการ Render โดยใช้ฐานข้อมูล PostgreSQL ของ Render</p>
+<h2>ขั้นตอนที่ 1 ทำความเข้าใจการนำขึ้นใช้งานจริง</h2>
+<ul>
+<li>เซิร์ฟเวอร์ <code>runserver</code> ใช้เฉพาะตอนพัฒนา ตามเอกสารของ Django ไม่ควรใช้กับเว็บจริง เว็บจริงใช้เว็บเซิร์ฟเวอร์ที่รองรับมาตรฐาน WSGI ซึ่งเป็นมาตรฐานที่เว็บเซิร์ฟเวอร์ใช้เรียกโปรเจกต์ผ่านไฟล์ <code>wsgi.py</code> (ที่เห็นในบทที่ 1) ในที่นี้ใช้ gunicorn ซึ่งทำงานบนระบบ Unix เช่น Linux ของ Render</li>
+<li>เมื่อ <code>DEBUG</code> เป็น <code>False</code> (บทที่ 14) Django ไม่ส่งสแตติกไฟล์ให้ ต้องใช้ WhiteNoise ซึ่งเป็นแพ็กเกจที่ทำให้แอป Django ส่งสแตติกไฟล์เองได้</li>
+<li>คำสั่ง <code>collectstatic</code> ของ Django รวมสแตติกไฟล์จากทุกแอป (รวมถึงของหน้าผู้ดูแลระบบ) ไปไว้ในโฟลเดอร์เดียวตาม <code>STATIC_ROOT</code> เพื่อให้เว็บเซิร์ฟเวอร์ส่งไฟล์ได้</li>
+<li>ฐานข้อมูลบน Render ใช้ PostgreSQL จึงตรงกับฐานข้อมูลที่ใช้ตั้งแต่บทที่ 7 และโค้ดใน <code>settings.py</code> ที่อ่านค่าจาก <code>.env</code> ในบทที่ 14 ใช้ได้โดยไม่ต้องแก้ โดยเปลี่ยนเฉพาะค่าตัวแปรบนเซิร์ฟเวอร์</li>
+</ul>
+<h2>ขั้นตอนที่ 2 ติดตั้ง gunicorn และ WhiteNoise</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>pipenv install gunicorn whitenoise</code></pre></figure>
+<h2>ขั้นตอนที่ 3 แก้ settings.py</h2>
+<p>เปิดไฟล์ <code>project_jrd/settings.py</code> แล้วแก้ 3 จุด จุดแรก เพิ่ม WhiteNoise ใน <code>MIDDLEWARE</code> ต่อจากบรรทัด <code>SecurityMiddleware</code></p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/15-deploy-heroku/project_jrd/settings.py" target="_blank" rel="noopener">project_jrd/settings.py (ส่วนที่แก้)</a></span><button type="button">คัดลอก</button></figcaption><pre><code>MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    ...
+]</code></pre></figure>
+<p>จุดที่สอง เพิ่มค่า 2 บรรทัดต่อจาก <code>STATIC_URL = 'static/'</code></p>
+<figure class="code"><figcaption><span>project_jrd/settings.py (ส่วนที่เพิ่ม)</span><button type="button">คัดลอก</button></figcaption><pre><code>STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>'whitenoise.middleware.WhiteNoiseMiddleware'</code></td><td>มิดเดิลแวร์ (Middleware) คือส่วนที่คำขอและการตอบกลับทุกครั้งผ่านก่อนถึงวิว WhiteNoise ต้องอยู่ต่อจาก <code>SecurityMiddleware</code> เพื่อรับคำขอสแตติกไฟล์และตอบกลับเอง</td></tr>
+<tr><td><code>STATIC_ROOT = BASE_DIR / 'staticfiles'</code></td><td>โฟลเดอร์ปลายทางของ <code>collectstatic</code> คือ <code>staticfiles</code> ในโฟลเดอร์โปรเจกต์ ใช้ชื่อต่างจากโฟลเดอร์ <code>static</code> ของแต่ละแอปเพื่อไม่ให้สับสน</td></tr>
+<tr><td><code>STATICFILES_STORAGE = '...CompressedManifestStaticFilesStorage'</code></td><td>ตัวจัดเก็บสแตติกไฟล์ของ WhiteNoise ที่บีบอัดไฟล์ และเติมรหัสสั้น ต่อท้ายชื่อไฟล์ตามเนื้อหา เช่น <code>main.9bcd2241ce49.css</code> เมื่อเนื้อหาไฟล์เปลี่ยน ชื่อไฟล์ก็เปลี่ยน เบราว์เซอร์จึงไม่ใช้ไฟล์เก่าที่เก็บไว้</td></tr>
+</tbody></table>
+<p>จุดที่สาม เพิ่มค่า <code>CSRF_TRUSTED_ORIGINS</code> ต่อจากบรรทัด <code>ALLOWED_HOSTS</code> ที่เพิ่มในบทที่ 14</p>
+<figure class="code"><figcaption><span>project_jrd/settings.py (ส่วนที่เพิ่ม)</span><button type="button">คัดลอก</button></figcaption><pre><code>production_host = os.getenv('PRODUCTION_HOST')
+ALLOWED_HOSTS = [production_host] if production_host is not None else []
+CSRF_TRUSTED_ORIGINS = ['https://' + production_host] if production_host is not None else []</code></pre></figure>
+<p>ตั้งแต่ Django 4.0 การตรวจโทเคน CSRF ของคำขอ POST (บทที่ 10) เทียบหัวข้อ <code>Origin</code> ของคำขอกับโปรโตคอลและโฮสต์ที่ Django เห็น ถ้าเซิร์ฟเวอร์รับคำขอผ่านตัวกลางที่แปลง HTTPS เป็น HTTP ค่าจะไม่ตรงกันและ Django ปฏิเสธคำขอ POST ด้วยสถานะ 403 <code>CSRF_TRUSTED_ORIGINS</code> คือรายการต้นทางที่เชื่อถือ ซึ่งต้องมีโปรโตคอล (<code>https://</code>) นำหน้า บรรทัดนี้เพิ่มโดเมนของเว็บจริงเข้าไป ส่วนบนเครื่องของผู้เรียนที่ไม่มี <code>PRODUCTION_HOST</code> ค่าเป็นลิสต์ว่างและไม่มีผล</p>
+<h2>ขั้นตอนที่ 4 สร้างไฟล์ requirements.txt</h2>
+<p>Render ติดตั้งแพ็กเกจจากไฟล์ <code>requirements.txt</code> ซึ่งเป็นรายการแพ็กเกจและเวอร์ชันที่ <code>pip</code> อ่านได้ สร้างจากข้อมูลใน <code>Pipfile.lock</code> ด้วยคำสั่ง</p>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>pipenv requirements &gt; requirements.txt</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>pipenv requirements</code></td><td>คำสั่งของ pipenv ที่แสดงรายการแพ็กเกจและเวอร์ชันที่ล็อกไว้ในรูปแบบของ <code>requirements.txt</code></td></tr>
+<tr><td><code>&gt; requirements.txt</code></td><td>เครื่องหมาย <code>&gt;</code> เขียนผลลัพธ์ของคำสั่งลงไฟล์ <code>requirements.txt</code> แทนการแสดงบนจอ</td></tr>
+</tbody></table>
+<p>เปิดไฟล์ <code>requirements.txt</code> ที่ได้ ต้องมีบรรทัดของ <code>django</code> (เวอร์ชัน 4.0.x), <code>gunicorn</code>, <code>whitenoise</code>, <code>psycopg2-binary</code> และ <code>python-dotenv</code> ซึ่งแต่ละบรรทัดอยู่ในรูป <code>ชื่อแพ็กเกจ==เวอร์ชัน</code> อาจมีเงื่อนไขต่อท้าย เช่น <code>; python_version &gt;= '3.8'</code> และมีแพ็กเกจที่ Django เรียกใช้ต่อ เช่น <code>asgiref</code> และ <code>sqlparse</code> รวมอยู่ด้วย</p>
+<p>ทุกครั้งที่ติดตั้งหรือเปลี่ยนแพ็กเกจด้วย pipenv ให้สร้างไฟล์นี้ใหม่</p>
+<h2>ขั้นตอนที่ 5 สร้างไฟล์ build.sh</h2>
+<p>Render รันคำสั่งในช่อง Build Command ทุกครั้งที่นำโค้ดใหม่ขึ้นเว็บ สร้างไฟล์ <code>build.sh</code> ในโฟลเดอร์โปรเจกต์ (ข้าง <code>manage.py</code>)</p>
+<figure class="code"><figcaption><span>build.sh</span><button type="button">คัดลอก</button></figcaption><pre><code>#!/usr/bin/env bash
+# exit on error
+set -o errexit
+
+pip install -r requirements.txt
+
+python manage.py collectstatic --no-input
+python manage.py migrate</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>#!/usr/bin/env bash</code></td><td>บรรทัดแรกบอกว่าไฟล์นี้ใช้โปรแกรม bash (เชลล์ของ Linux) รัน</td></tr>
+<tr><td><code>set -o errexit</code></td><td>ให้สคริปต์หยุดทันทีถ้าคำสั่งใดล้มเหลว</td></tr>
+<tr><td><code>pip install -r requirements.txt</code></td><td>ติดตั้งแพ็กเกจทั้งหมดในไฟล์ <code>requirements.txt</code></td></tr>
+<tr><td><code>python manage.py collectstatic --no-input</code></td><td>รวมสแตติกไฟล์ไปไว้ที่ <code>STATIC_ROOT</code> <code>--no-input</code> คือไม่ต้องถามยืนยัน</td></tr>
+<tr><td><code>python manage.py migrate</code></td><td>สร้างหรือปรับตารางในฐานข้อมูลบน Render ตามไมเกรชัน (บทที่ 7)</td></tr>
+</tbody></table>
+<p>ไฟล์นี้ทำงานบน Linux ของ Render จึงต้องบันทึกแบบขึ้นบรรทัดใหม่ของ Linux (LF) ใน Visual Studio Code ดูได้ที่แถบสถานะมุมขวาล่าง ถ้าแสดง <code>CRLF</code> ให้คลิกแล้วเลือก <code>LF</code> ก่อนบันทึก หากไฟล์บน GitHub เป็น CRLF ขั้นตอน Build บน Render อาจล้มเหลว</p>
+<h2>ขั้นตอนที่ 6 กำหนดเวอร์ชัน Python บน Render</h2>
+<p>Render เลือกเวอร์ชัน Python ให้เองถ้าไม่กำหนด ซึ่งบริการที่สร้างใหม่ใช้ Python 3.14 ขณะที่ Django 4.0 รองรับ Python 3.8 ถึง 3.10 จึงต้องกำหนดเวอร์ชันเอง โดยสร้างไฟล์ <code>.python-version</code> ในโฟลเดอร์โปรเจกต์ (ข้าง <code>manage.py</code>) เขียนเวอร์ชันบรรทัดเดียว หากไม่ระบุเลขท้าย Render ใช้รุ่นล่าสุดของเวอร์ชันนั้น</p>
+<figure class="code"><figcaption><span>.python-version</span><button type="button">คัดลอก</button></figcaption><pre><code>3.10</code></pre></figure>
+<h2>ขั้นตอนที่ 7 ทดสอบจำลองการใช้งานจริงบนเครื่อง</h2>
+<p>ก่อนอัปโหลด ทดสอบว่า WhiteNoise ส่งสแตติกไฟล์ได้เมื่อ <code>DEBUG</code> เป็น <code>False</code> แก้ไฟล์ <code>project_jrd/.env</code> ชั่วคราว โดยเปลี่ยน <code>DEBUG=True</code> เป็น <code>DEBUG=False</code> และเพิ่มบรรทัด <code>PRODUCTION_HOST=127.0.0.1</code> แล้วรันคำสั่ง</p>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py collectstatic --no-input
+python manage.py runserver</code></pre></figure>
+<p>คำสั่ง <code>collectstatic</code> แสดงจำนวนไฟล์ที่คัดลอก (เช่น <code>152 static files copied ... 418 post-processed</code>) และสร้างโฟลเดอร์ <code>staticfiles</code> เปิด <code>http://127.0.0.1:8000/</code> ต้องเห็นหน้าเว็บที่มี CSS ภาพ และฟอนต์ครบเหมือนบทที่ 13 (ซึ่งต่างจากการทดลองท้ายบทที่ 14 ที่สแตติกไฟล์หาย) แล้วหยุดเซิร์ฟเวอร์และแก้ <code>.env</code> กลับเป็น <code>DEBUG=True</code> พร้อมลบบรรทัด <code>PRODUCTION_HOST</code></p>
+<p>บน Windows ให้ทดสอบด้วย <code>runserver</code> เพราะ gunicorn ทำงานบน Windows ไม่ได้ gunicorn จะทำงานบนเซิร์ฟเวอร์ของ Render</p>
+<p>ขั้นตอนที่ 1 ถึง 7 ทำในโปรเจกต์บนเครื่องของผู้เรียน ส่วนขั้นตอนที่ 8 ถึง 11 ทำบนเว็บไซต์ GitHub และ Render โดยต้องมีบัญชีของทั้งสองเว็บไซต์</p>
+<h2>ขั้นตอนที่ 8 อัปโหลดโค้ดขึ้น GitHub</h2>
+<p>Render นำโค้ดจากรีโพสิตอรี (Repository) บน GitHub ไปสร้างเว็บ ติดตั้งโปรแกรม Git จาก https://git-scm.com (ถ้ายังไม่มี) สร้างบัญชีที่ https://github.com และสร้างรีโพสิตอรีใหม่ที่ https://github.com/new (ตั้งชื่อ เช่น <code>django-junraider</code> ไม่ต้องเลือกให้สร้างไฟล์ README) จากนั้นเพิ่มบรรทัดนี้ท้ายไฟล์ <code>.gitignore</code> ที่สร้างในบทที่ 14 เพื่อไม่ให้อัปโหลดโฟลเดอร์ที่ <code>collectstatic</code> สร้าง</p>
+<figure class="code"><figcaption><span>.gitignore (ส่วนที่เพิ่มท้ายไฟล์)</span><button type="button">คัดลอก</button></figcaption><pre><code>staticfiles/</code></pre></figure>
+<p>ถ้าใช้ Git เป็นครั้งแรกบนเครื่องนี้ ให้ตั้งชื่อและอีเมลที่จะบันทึกในประวัติของ Git ก่อน (ทำครั้งเดียวต่อเครื่อง)</p>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>git config --global user.name "&lt;ชื่อของผู้เรียน&gt;"
+git config --global user.email "&lt;อีเมลที่ใช้กับ GitHub&gt;"</code></pre></figure>
+<p>จากนั้นรันคำสั่งต่อไปนี้ในโฟลเดอร์โปรเจกต์ โดยแทน <code>&lt;ชื่อบัญชี&gt;</code> ด้วยชื่อบัญชี GitHub ของตน ครั้งแรกที่ <code>git push</code> จะมีหน้าต่างให้เข้าสู่ระบบ GitHub</p>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>git init
+git add .
+git update-index --chmod=+x build.sh
+git commit -m "Prepare for Render"
+git branch -M main
+git remote add origin https://github.com/&lt;ชื่อบัญชี&gt;/django-junraider.git
+git push -u origin main</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>git init</code></td><td>สร้างรีโพสิตอรีของ Git ในโฟลเดอร์นี้ (ข้ามขั้นนี้ถ้าโฟลเดอร์เป็นรีโพสิตอรีอยู่แล้ว)</td></tr>
+<tr><td><code>git add .</code></td><td>เลือกไฟล์ทั้งหมดที่ <code>.gitignore</code> ไม่ได้ยกเว้นเพื่อเตรียมบันทึก</td></tr>
+<tr><td><code>git update-index --chmod=+x build.sh</code></td><td>ตั้งสิทธิ์ให้ไฟล์ <code>build.sh</code> รันได้ (Executable) เพราะ Render เรียกไฟล์นี้เป็นโปรแกรม Windows ไม่มีสิทธิ์ประเภทนี้ในไฟล์ จึงต้องตั้งใน Git</td></tr>
+<tr><td><code>git commit -m "..."</code></td><td>บันทึกการเปลี่ยนแปลงพร้อมข้อความอธิบาย</td></tr>
+<tr><td><code>git branch -M main</code></td><td>ตั้งชื่อบรานช์หลักเป็น <code>main</code></td></tr>
+<tr><td><code>git remote add origin &lt;URL&gt;</code></td><td>ผูกรีโพสิตอรีในเครื่องกับรีโพสิตอรีบน GitHub</td></tr>
+<tr><td><code>git push -u origin main</code></td><td>ส่งโค้ดขึ้น GitHub</td></tr>
+</tbody></table>
+<p>เมื่อสำเร็จ เปิดหน้ารีโพสิตอรีบน GitHub แล้วต้องเห็นไฟล์ <code>build.sh</code>, <code>requirements.txt</code>, <code>.python-version</code> และไม่เห็นไฟล์ <code>project_jrd/.env</code></p>
+<h2>ขั้นตอนที่ 9 สร้างฐานข้อมูล PostgreSQL บน Render</h2>
+<ul>
+<li>สมัครและเข้าสู่ระบบที่ https://dashboard.render.com แล้วเชื่อมบัญชี GitHub ตามที่ Render แนะนำ</li>
+<li>คลิก New (+) แล้วเลือก Postgres</li>
+<li>ตั้ง Name (เช่น <code>django-junraider-db</code>) เลือก Region ให้เป็นที่เดียวกับที่จะใช้กับเว็บในขั้นตอนถัดไป และเลือกแผน (Compute Plan) ฐานข้อมูลแผน Free ของ Render หมดอายุ 30 วันหลังสร้าง</li>
+<li>คลิก Create Database รอจนสถานะเป็น Available</li>
+<li>คลิกเมนู Connect มุมขวาบนของหน้าฐานข้อมูล แล้วคัดลอก Internal URL (ใช้ได้กับเว็บของ Render ในภูมิภาคเดียวกัน)</li>
+</ul>
+<p>Internal URL มีรูปแบบ <code>postgresql://ผู้ใช้:รหัสผ่าน@โฮสต์/ชื่อฐานข้อมูล</code> แยกเป็นค่าที่ใช้ในขั้นตอนถัดไปได้ 4 ค่า ได้แก่ ผู้ใช้ รหัสผ่าน โฮสต์ และชื่อฐานข้อมูล ส่วนพอร์ตคือ <code>5432</code></p>
+<h2>ขั้นตอนที่ 10 สร้างเว็บเซอร์วิสบน Render</h2>
+<ul>
+<li>ใน Render คลิก New (+) แล้วเลือก Web Service เลือกรีโพสิตอรี <code>django-junraider</code> ที่เพิ่งอัปโหลด (ให้สิทธิ์ Render เข้าถึงรีโพสิตอรีถ้าถูกถาม)</li>
+<li>ตั้ง Name เช่น <code>django-junraider</code> ซึ่งมักเป็นส่วนแรกของที่อยู่เว็บ (<code>ชื่อ.onrender.com</code>) เลือก Language เป็น Python 3 และ Region เดียวกับฐานข้อมูล</li>
+<li>ช่อง Build Command ใส่ <code>./build.sh</code></li>
+<li>ช่อง Start Command ใส่ <code>gunicorn project_jrd.wsgi</code></li>
+<li>เลือกแผนตามต้องการ แล้วเปิดส่วน Advanced เพื่อเพิ่มตัวแปรสภาพแวดล้อม (Environment Variable) ตามตารางด้านล่าง</li>
+</ul>
+<table class="exp"><thead><tr><th>ช่อง</th><th>ค่าที่ใส่</th></tr></thead><tbody>
+<tr><td><code>Build Command: ./build.sh</code></td><td>รันไฟล์ <code>build.sh</code> ในขั้นตอนที่ 5</td></tr>
+<tr><td><code>Start Command: gunicorn project_jrd.wsgi</code></td><td>เริ่ม gunicorn โดยให้เรียกตัวแอป WSGI ของโปรเจกต์ในไฟล์ <code>project_jrd/wsgi.py</code> </td></tr>
+</tbody></table>
+<table class="exp"><thead><tr><th>ตัวแปร (Key)</th><th>ค่า (Value)</th></tr></thead><tbody>
+<tr><td><code>SECRET_KEY</code></td><td>รหัสลับใหม่สำหรับเว็บจริง ให้สร้างด้วยคำสั่งในบทที่ 14 หรือกดปุ่ม Generate ของ Render (ห้ามใช้ค่าเดียวกับในเครื่อง)</td></tr>
+<tr><td><code>PRODUCTION_HOST</code></td><td>ชื่อโดเมนของเว็บ เช่น <code>django-junraider.onrender.com</code> ไม่ต้องใส่ <code>https://</code> ถ้ายังไม่ทราบโดเมนจริง ให้ใส่ค่าที่คาด แล้วตรวจและแก้ภายหลังจากหน้าเซอร์วิส</td></tr>
+<tr><td><code>DB_NAME / DB_USER / DB_PASS / DB_HOST</code></td><td>ชื่อฐานข้อมูล ผู้ใช้ รหัสผ่าน และโฮสต์ จาก Internal URL ในขั้นตอนที่ 9</td></tr>
+<tr><td><code>DB_PORT</code></td><td><code>5432</code></td></tr>
+<tr><td><code>DEBUG</code></td><td>ไม่ต้องตั้ง เมื่อไม่มีตัวแปรนี้ <code>settings.py</code> ถือว่า <code>DEBUG</code> เป็น <code>False</code></td></tr>
+</tbody></table>
+<ul>
+<li>คลิก Create Web Service Render จะดึงโค้ดจาก GitHub รัน <code>./build.sh</code> แล้วเริ่มเซิร์ฟเวอร์ ดูความคืบหน้าในแท็บ Logs</li>
+<li>เมื่อ Logs แสดงว่าเว็บทำงานแล้ว (Live) ให้เปิดที่อยู่ที่ Render แสดงใต้ชื่อเซอร์วิส</li>
+<li>ถ้าโดเมนจริงไม่ตรงกับค่า <code>PRODUCTION_HOST</code> ให้แก้ค่าในแท็บ Environment แล้วบันทึก Render จะนำขึ้นใหม่อัตโนมัติ</li>
+</ul>
+<h2>ขั้นตอนที่ 11 สร้างบัญชีผู้ดูแลและเพิ่มข้อมูลเมนูบนเว็บจริง</h2>
+<p>ฐานข้อมูลบน Render เป็นฐานข้อมูลใหม่ที่มีเฉพาะตารางจากไมเกรชัน ยังไม่มีบัญชีผู้ดูแลและข้อมูลเมนู เว็บเซอร์วิสแผน Free ของ Render ไม่มีหน้าต่าง Shell ให้รันคำสั่ง จึงสร้างบัญชีผู้ดูแลจากเครื่องของผู้เรียน โดยให้โปรเจกต์ในเครื่องเชื่อมต่อกับฐานข้อมูลบน Render ชั่วคราว</p>
+<ul>
+<li>ในหน้าฐานข้อมูลบน Render คลิกเมนู Connect แล้วคัดลอก External URL ซึ่งเป็นที่อยู่สำหรับเชื่อมต่อจากเครื่องที่อยู่นอก Render รูปแบบเหมือน Internal URL แต่โฮสต์ยาวกว่า</li>
+<li>เปิดไฟล์ <code>project_jrd/.env</code> ในเครื่อง แล้วเปลี่ยนค่า <code>DB_NAME</code>, <code>DB_USER</code>, <code>DB_PASS</code>, <code>DB_HOST</code> ชั่วคราวเป็นค่าจาก External URL (คงค่า <code>DB_PORT=5432</code>)</li>
+</ul>
+<p>รันคำสั่งสร้างบัญชีผู้ดูแล แล้วตอบคำถามเหมือนบทที่ 11 บัญชีจะถูกบันทึกลงฐานข้อมูลบน Render</p>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py createsuperuser</code></pre></figure>
+<p>เมื่อสร้างเสร็จ ให้แก้ไฟล์ <code>.env</code> กลับเป็นค่าของฐานข้อมูลในเครื่องตามบทที่ 14 จากนั้นเปิด <code>https://&lt;โดเมนของเว็บ&gt;/admin/</code> เข้าสู่ระบบด้วยบัญชีที่สร้าง แล้วเพิ่มเมนูด้วยปุ่ม เพิ่ม food กรอกข้อมูลตามตัวอย่างในบทที่ 8 และช่อง Image relative url ตามตารางในบทที่ 12 เช่น <code>app_foods/food-red-spicy.jpg</code> ไฟล์ภาพอยู่ในโค้ดที่อัปโหลดแล้ว</p>
+<h2>ผลลัพธ์ที่ควรได้</h2>
+<ul>
+<li>Logs ของขั้นตอน Build แสดงการติดตั้งแพ็กเกจ <code>collectstatic</code> และ <code>Applying ...</code> ของ <code>migrate</code> ไม่มีข้อผิดพลาด</li>
+<li>เปิดที่อยู่ <code>https://&lt;โดเมนของเว็บ&gt;/</code> เห็นหน้าแรกพร้อมฟอนต์ ภาพ และสีเหมือนบทที่ 13</li>
+<li>หน้า <code>/foods/</code> แสดงเมนูที่เพิ่มในขั้นตอนที่ 11 พร้อมภาพ</li>
+<li>หน้า <code>/subscription</code> ส่งฟอร์มแล้วไปหน้าขอบคุณ ไม่แสดงข้อความ 403 และแถวใหม่ปรากฏในตาราง Subscription ในหน้าผู้ดูแลระบบ</li>
+<li>เข้า <code>/admin/</code> ได้ และหน้าผู้ดูแลระบบมี CSS ครบ (ซึ่งเป็นผลของ WhiteNoise กับ <code>collectstatic</code>)</li>
+</ul>
+<h2>โครงสร้างไฟล์หลังจบบท</h2>
+<p>แสดงเฉพาะไฟล์ที่เพิ่มหรือแก้ในบทนี้ (+ คือไฟล์ที่สร้างใหม่, * คือไฟล์ที่แก้ไข)</p>
+<figure class="code"><figcaption><span>django-junraider/</span></figcaption><pre><code>django-junraider/
+├── .gitignore               *
+├── .python-version          +
+├── Pipfile                  *
+├── Pipfile.lock             *
+├── build.sh                 +
+├── requirements.txt         +
+└── project_jrd/
+    └── settings.py          *</code></pre></figure>
+<div class="pager"><a href="ch14.html">&larr; บทก่อนหน้า: บทที่ 14</a><span></span></div></main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

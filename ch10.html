@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class=""><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class=""><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class=""><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class=""><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class=""><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class=""><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class=""><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class=""><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class=""><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class=""><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class="cur"><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class=""><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class=""><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class=""><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class=""><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class=""><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<p class="ch">บทที่ 10 จาก 15</p>
+<h1>แบบฟอร์ม วิว และเทมเพลต (forms)</h1>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider/tree/10-forms-views-templates" target="_blank" rel="noopener">บรานช์ 10-forms-views-templates</a> · <a href="https://github.com/potchangelo/django-junraider/compare/09-models-views-templates...10-forms-views-templates" target="_blank" rel="noopener">ส่วนที่เปลี่ยนจากบทก่อนหน้า</a></p>
+<h2>วัตถุประสงค์</h2>
+<p>เมื่อจบบทนี้ ผู้เรียนสร้างแบบฟอร์ม (Form) ด้วยคลาสของ Django รับข้อมูลที่ผู้ใช้ส่งมา (POST) ตรวจสอบความถูกต้อง และบันทึกลงฐานข้อมูล ทำให้หน้าลงทะเบียนรับโปรโมชั่นใช้งานได้จริง</p>
+<h2>ขั้นตอนที่ 1 ทำความเข้าใจการทำงานของแบบฟอร์ม</h2>
+<ul>
+<li>เบราว์เซอร์ขอหน้าฟอร์มด้วยเมธอด (Method) GET แล้วผู้ใช้กรอกข้อมูลและกดส่ง เบราว์เซอร์จะส่งข้อมูลกลับมาด้วยเมธอด POST ไปยังที่อยู่เดียวกัน</li>
+<li>วิวจึงต้องแยกการทำงานเป็น 2 กรณีตาม <code>request.method</code> คือ GET แสดงฟอร์มเปล่า และ POST รับข้อมูล ตรวจสอบ แล้วบันทึกหรือแสดงฟอร์มพร้อมข้อความผิดพลาด</li>
+<li>คลาสฟอร์มของ Django (<code>forms.Form</code>) กำหนดฟิลด์และกติกาการตรวจสอบ ส่วน <code>forms.ModelForm</code> สร้างฟิลด์จากโมเดลให้อัตโนมัติและบันทึกลงฐานข้อมูลได้ด้วย <code>save()</code></li>
+<li>เมื่อบันทึกสำเร็จ วิวส่งผู้ใช้ไปหน้าอื่นด้วยการเปลี่ยนเส้นทาง (Redirect) เพื่อไม่ให้ส่งข้อมูลซ้ำเมื่อรีเฟรชหน้า</li>
+</ul>
+<h2>ขั้นตอนที่ 2 สร้างไฟล์ forms.py</h2>
+<p>สร้างไฟล์ใหม่ชื่อ <code>app_general/forms.py</code> แล้วพิมพ์โค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/10-forms-views-templates/app_general/forms.py" target="_blank" rel="noopener">app_general/forms.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django import forms
+from app_foods.models import Food
+from app_general.models import Subscription
+
+# Custom field class
+class FoodMultipleChoiceField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        return obj.title
+
+# Form class
+class SubscriptionForm(forms.Form):
+    name = forms.CharField(max_length=50, required=True, label='ชื่อ-นามสกุล')
+    email = forms.EmailField(max_length=50, required=True, label='อีเมล')
+    food_set = FoodMultipleChoiceField(
+        queryset=Food.objects.order_by('-is_premium'), 
+        required=True, 
+        label='เมนูที่สนใจ',
+        widget=forms.CheckboxSelectMultiple
+        )
+    accepted = forms.BooleanField(required=True, label='ข้อความยาวๆที่หลายคนเคยเจอ อาจไม่ต้องอ่านก็ได้ แค่ยอมรับและเข้าใจก็พอ')
+
+# Model form class
+class SubscriptionModelForm(forms.ModelForm):
+    food_set = FoodMultipleChoiceField(
+        queryset=Food.objects.order_by('-is_premium'), 
+        required=True, 
+        label='เมนูที่สนใจ',
+        widget=forms.CheckboxSelectMultiple
+        )
+    accepted = forms.BooleanField(required=True, label='ข้อความยาวๆที่หลายคนเคยเจอ อาจไม่ต้องอ่านก็ได้ แค่ยอมรับและเข้าใจก็พอ')
+
+    class Meta:
+        model = Subscription
+        fields = ['name', 'email', 'food_set', 'accepted']
+        labels = {
+            'name': 'ชื่อ-นามสกุล',
+            'email': 'อีเมล',
+            'food_set': 'เลือกเมนูที่สนใจ'
+        }</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>class FoodMultipleChoiceField(forms.ModelMultipleChoiceField):</code></td><td>คลาสฟิลด์เลือกได้หลายรายการจากโมเดล ที่เขียนขึ้นเองโดยสืบทอดจากคลาสของ Django</td></tr>
+<tr><td><code>def label_from_instance(self, obj): return obj.title</code></td><td>กำหนดข้อความที่แสดงเป็นตัวเลือกแต่ละรายการให้เป็นชื่อเมนู (<code>title</code>) แทนค่าเริ่มต้น</td></tr>
+<tr><td><code>class SubscriptionForm(forms.Form):</code></td><td>ฟอร์มแบบทั่วไป ประกาศฟิลด์ทีละตัวเอง ไม่ผูกกับโมเดล เขียนไว้เพื่อเปรียบเทียบกับ <code>SubscriptionModelForm</code> ด้านล่าง วิวในบทนี้ไม่ได้ใช้คลาสนี้</td></tr>
+<tr><td><code>forms.CharField(max_length=50, required=True, label='ชื่อ-นามสกุล')</code></td><td>ฟิลด์ข้อความ <code>required=True</code> คือห้ามเว้นว่าง และ <code>label</code> คือป้ายข้อความ</td></tr>
+<tr><td><code>forms.EmailField(...)</code></td><td>ฟิลด์อีเมล ตรวจรูปแบบอีเมล</td></tr>
+<tr><td><code>queryset=Food.objects.order_by('-is_premium')</code></td><td>ที่มาของตัวเลือก คือ QuerySet ของเมนู</td></tr>
+<tr><td><code>widget=forms.CheckboxSelectMultiple</code></td><td>วิดเจ็ต (Widget) คือส่วนที่กำหนดว่าฟิลด์แสดงเป็น HTML แบบใด ในที่นี้เป็นเช็กบอกซ์หลายช่อง</td></tr>
+<tr><td><code>accepted = forms.BooleanField(required=True, ...)</code></td><td>เช็กบอกซ์ยอมรับข้อตกลง ต้องเลือกจึงจะส่งได้ ฟิลด์นี้ไม่มีในโมเดล จึงไม่ถูกบันทึกลงฐานข้อมูล</td></tr>
+<tr><td><code>class SubscriptionModelForm(forms.ModelForm):</code></td><td>ฟอร์มที่ผูกกับโมเดล ฟิลด์ที่ไม่ได้ประกาศเองจะสร้างจากโมเดล</td></tr>
+<tr><td><code>class Meta: model = Subscription</code></td><td>คลาสย่อย <code>Meta</code> บอกรายละเอียดของฟอร์ม <code>model</code> คือโมเดลที่ผูก</td></tr>
+<tr><td><code>fields = ['name', 'email', 'food_set', 'accepted']</code></td><td>รายการฟิลด์ที่แสดงในฟอร์มตามลำดับ</td></tr>
+<tr><td><code>labels = { ... }</code></td><td>กำหนดป้ายข้อความของฟิลด์ที่สร้างจากโมเดล</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 3 แก้วิวให้รับข้อมูลจากฟอร์ม</h2>
+<p>แทนที่เนื้อหาของ <code>app_general/views.py</code> ด้วยโค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/10-forms-views-templates/app_general/views.py" target="_blank" rel="noopener">app_general/views.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.http.response import HttpResponseRedirect
+from django.shortcuts import render
+from django.urls import reverse
+from app_general.forms import SubscriptionModelForm
+
+# Create your views here.
+
+def home(request):
+    return render(request, 'app_general/home.html')
+
+def about(request):
+    return render(request, 'app_general/about.html')
+
+def subscription(request):
+    # POST
+    if request.method == 'POST':
+        form = SubscriptionModelForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('subscription_thankyou'))
+    else:
+        form = SubscriptionModelForm()
+    
+    # GET
+    context = {'form': form}
+    return render(request, 'app_general/subscription_form.html', context)
+
+def subscription_thankyou(request):
+    return render(request, 'app_general/subscription_thankyou.html')</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>from django.http.response import HttpResponseRedirect</code></td><td>คลาสที่สร้างการตอบกลับแบบเปลี่ยนเส้นทาง</td></tr>
+<tr><td><code>from django.urls import reverse</code></td><td>ฟังก์ชัน <code>reverse</code> แปลงชื่อเส้นทางเป็นที่อยู่ในวิว เหมือนแท็ก <code>url</code> ในเทมเพลต</td></tr>
+<tr><td><code>if request.method == 'POST':</code></td><td>กรณีที่เบราว์เซอร์ส่งข้อมูลมา</td></tr>
+<tr><td><code>form = SubscriptionModelForm(request.POST)</code></td><td>สร้างฟอร์มที่มีข้อมูลที่ส่งมา (<code>request.POST</code>)</td></tr>
+<tr><td><code>if form.is_valid():</code></td><td>ตรวจสอบข้อมูลตามกติกาของฟิลด์ทั้งหมด ได้ <code>True</code> เมื่อถูกต้อง</td></tr>
+<tr><td><code>form.save()</code></td><td>บันทึกลงฐานข้อมูล รวมถึงเมนูที่เลือก (ความสัมพันธ์ <code>food_set</code>)</td></tr>
+<tr><td><code>return HttpResponseRedirect(reverse('subscription_thankyou'))</code></td><td>ส่งผู้ใช้ไปหน้าขอบคุณ</td></tr>
+<tr><td><code>else: form = SubscriptionModelForm()</code></td><td>กรณี GET สร้างฟอร์มเปล่า</td></tr>
+<tr><td><code>context = {'form': form}</code></td><td>ส่งฟอร์มไปเทมเพลต กรณี POST ที่ข้อมูลไม่ถูกต้อง โค้ดจะมาถึงบรรทัดนี้พร้อมฟอร์มที่เก็บข้อความผิดพลาดไว้ เพื่อแสดงให้ผู้ใช้แก้ไข</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 4 แก้เทมเพลตของฟอร์ม</h2>
+<p>แทนที่เนื้อหาของ <code>subscription_form.html</code> ด้วยโค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/10-forms-views-templates/app_general/templates/app_general/subscription_form.html" target="_blank" rel="noopener">app_general/templates/app_general/subscription_form.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}ลงทะเบียนรับโปรโมชั่น - {% endblock %}
+
+{% block content %}
+&lt;h1&gt;ลงทะเบียนรับโปรโมชั่น&lt;/h1&gt;
+&lt;form action="{% url 'subscription' %}" method="POST"&gt;
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    &lt;div style="margin-bottom: 16px;"&gt;
+        {{ form.name.label_tag }}
+        {{ form.name }}
+        {{ form.name.errors }}
+    &lt;/div&gt;
+    &lt;div style="margin-bottom: 16px;"&gt;
+        {{ form.email.label_tag }}
+        {{ form.email }}
+        {{ form.email.errors }}
+    &lt;/div&gt;
+    &lt;div style="margin-bottom: 16px;"&gt;
+        {{ form.food_set.label_tag }}
+        {{ form.food_set }}
+        {{ form.food_set.errors }}
+    &lt;/div&gt;
+    &lt;div style="margin-bottom: 16px;"&gt;
+        &lt;label&gt;อ่านข้อตกลงเพิ่มเติม&lt;/label&gt;
+        &lt;label&gt;
+            {{ form.accepted }} {{ form.accepted.label }}
+        &lt;/label&gt;
+        {{ form.accepted.errors }}
+    &lt;/div&gt;
+    &lt;div style="margin-bottom: 16px;"&gt;
+        &lt;button type="submit"&gt;ลงทะเบียนรับโปรโมชั่น&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/form&gt;
+{% endblock %}</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>&lt;form action="{% url 'subscription' %}" method="POST"&gt;</code></td><td>ฟอร์ม HTML ส่งข้อมูลไปยังที่อยู่ของเส้นทาง <code>subscription</code> ด้วยเมธอด POST</td></tr>
+<tr><td><code>{% csrf_token %}</code></td><td>แท็กสร้างฮิดเดนฟิลด์ (Hidden Field) ที่เก็บโทเคนป้องกันการโจมตีแบบ CSRF (Cross-Site Request Forgery) ซึ่งคือการหลอกให้เบราว์เซอร์ของผู้ใช้ส่งคำขอไปยังเว็บโดยไม่รู้ตัว Django ปฏิเสธคำขอ POST ที่ไม่มีโทเคนนี้ ฟอร์ม POST ทุกฟอร์มต้องมีแท็กนี้</td></tr>
+<tr><td><code>{{ form.non_field_errors }}</code></td><td>ข้อความผิดพลาดที่ไม่เกี่ยวกับฟิลด์ใดฟิลด์หนึ่ง</td></tr>
+<tr><td><code>{{ form.name.label_tag }}</code></td><td>สร้างป้ายข้อความ (<code>&lt;label&gt;</code>) ของฟิลด์ <code>name</code></td></tr>
+<tr><td><code>{{ form.name }}</code></td><td>สร้างช่องกรอกของฟิลด์ <code>name</code> ตามที่ประกาศในฟอร์ม</td></tr>
+<tr><td><code>{{ form.name.errors }}</code></td><td>แสดงข้อความผิดพลาดของฟิลด์นั้น เช่น ฟิลด์นี้จำเป็น หรือป้อนที่อยู่อีเมลที่ถูกต้อง</td></tr>
+<tr><td><code>{{ form.accepted.label }}</code></td><td>ข้อความป้ายของฟิลด์ที่แสดงเอง</td></tr>
+<tr><td><code>&lt;button type="submit"&gt;</code></td><td>ปุ่มส่งฟอร์ม</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 5 เปิดเซิร์ฟเวอร์และทดสอบ</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py runserver</code></pre></figure>
+<p>เปิด <code>http://127.0.0.1:8000/subscription</code> แล้วทดสอบตามตารางต่อไปนี้</p>
+<h2>ผลลัพธ์ที่ควรได้</h2>
+<table class="exp"><thead><tr><th>การทดสอบ</th><th>ผลที่เห็น</th></tr></thead><tbody>
+<tr><td><code>เปิดหน้าฟอร์ม</code></td><td>เห็นช่อง ชื่อ-นามสกุล อีเมล เช็กบอกซ์เมนู 5 รายการ (เมนูพิเศษอยู่ก่อน) และเช็กบอกซ์ยอมรับข้อตกลง</td></tr>
+<tr><td><code>กดส่งโดยไม่กรอกข้อมูล</code></td><td>เบราว์เซอร์แสดงข้อความเตือนที่ช่องแรกที่ยังไม่กรอก เพราะช่องกรอกมีคุณสมบัติ <code>required</code> ที่ Django ใส่ให้จาก <code>required=True</code></td></tr>
+<tr><td><code>กรอกอีเมลผิดรูปแบบ เช่น not-an-email</code></td><td>เบราว์เซอร์หรือ Django แสดงข้อความ ป้อนที่อยู่อีเมลที่ถูกต้อง</td></tr>
+<tr><td><code>กรอกครบ เลือกเมนูอย่างน้อย 1 รายการ และเลือกช่องยอมรับข้อตกลง แล้วส่ง</code></td><td>เปลี่ยนไปหน้า /subscription/thankyou และมีแถวใหม่ในตาราง <code>app_general_subscription</code> (สถานะ unapproved) กับตาราง <code>app_general_subscription_food_set</code> ตามจำนวนเมนูที่เลือก ตรวจได้ใน pgAdmin ด้วย View/Edit Data > All Rows</td></tr>
+<tr><td><code>กรอกชื่อ อีเมล เลือกช่องยอมรับข้อตกลง แต่ไม่เลือกเมนู แล้วส่ง</code></td><td>อยู่หน้าเดิม และแสดงข้อความ ฟิลด์นี้จำเป็น ใต้รายการเมนู ข้อความนี้มาจากการตรวจสอบของ Django (<code>form.is_valid()</code>) เพราะ <code>food_set</code> กำหนด <code>required=True</code></td></tr>
+<tr><td><code>ส่งอีเมลเดิมซ้ำ</code></td><td>ไม่บันทึกซ้ำ และแสดงข้อความ Subscription และ Email มีอยู่แล้ว เพราะฟิลด์ <code>email</code> กำหนด <code>unique=True</code></td></tr>
+</tbody></table>
+<h2>โครงสร้างไฟล์หลังจบบท</h2>
+<p>แสดงเฉพาะไฟล์ที่เพิ่มหรือแก้ในบทนี้ (+ คือไฟล์ที่สร้างใหม่, * คือไฟล์ที่แก้ไข)</p>
+<figure class="code"><figcaption><span>django-junraider/</span></figcaption><pre><code>django-junraider/
+└── app_general/
+    ├── forms.py                             +
+    ├── templates/app_general/
+    │   └── subscription_form.html           *
+    └── views.py                             *</code></pre></figure>
+<div class="pager"><a href="ch09.html">&larr; บทก่อนหน้า: บทที่ 9</a><a href="ch11.html">บทถัดไป: บทที่ 11 &rarr;</a></div></main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+*{box-sizing:border-box}
+body{margin:0;font-family:Tahoma,sans-serif;font-size:16px;line-height:1.7;color:#000;background:#fff}
+a{color:#000}
+.layout{display:flex;min-height:100vh}
+nav.side{width:280px;flex:none;border-right:1px solid #000;padding:20px 16px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto}
+nav.side .site{font-weight:bold;font-size:17px;display:block;margin-bottom:12px;text-decoration:none}
+nav.side ul{list-style:none;margin:0 0 14px;padding:0}
+nav.side li{margin:0;padding:3px 0;font-size:14px;line-height:1.5}
+nav.side li.off{color:#777}
+nav.side li.cur a{font-weight:bold;background:#000;color:#fff;padding:1px 6px;text-decoration:none}
+nav.side h4{margin:14px 0 4px;font-size:13px;border-bottom:1px solid #000}
+main{flex:1;min-width:0;padding:28px 40px 60px;max-width:900px}
+h1{font-size:28px;margin:0 0 6px;line-height:1.4}
+h2{font-size:21px;margin:34px 0 8px;border-bottom:2px solid #000;padding-bottom:4px;line-height:1.4}
+h3{font-size:17px;margin:20px 0 6px}
+.ch{font-size:14px;margin:0}
+p{margin:8px 0;overflow-wrap:anywhere}
+code{font-family:Consolas,"Courier New",monospace;font-size:14px;background:#eee;padding:0 4px}
+figure.code{margin:12px 0;border:1px solid #000}
+figure.code figcaption{display:flex;justify-content:space-between;align-items:center;background:#000;color:#fff;font-size:13px;padding:3px 8px;font-family:Consolas,monospace}
+figure.code figcaption span{overflow-wrap:anywhere}
+figure.code button{font-family:Tahoma,sans-serif;font-size:12px;background:#fff;color:#000;border:1px solid #fff;cursor:pointer;padding:0 8px;margin-left:8px;flex:none}
+figure.code pre{margin:0;padding:10px 12px;background:#f5f5f5;overflow-x:auto}
+figure.code pre code{background:none;padding:0;font-size:14px;line-height:1.5}
+figure.out figcaption{background:#fff;color:#000;border-bottom:1px solid #000}
+figure.out pre{background:#fff}
+table.exp{border-collapse:collapse;width:100%;margin:10px 0;font-size:15px}
+table.exp th,table.exp td{border:1px solid #000;padding:6px 8px;vertical-align:top;text-align:left;overflow-wrap:anywhere}
+table.exp th{background:#000;color:#fff;font-weight:normal}
+table.exp td:first-child{width:36%}
+table.toc{border-collapse:collapse;width:100%}
+table.toc th,table.toc td{border:1px solid #000;padding:6px 10px;text-align:left}
+table.toc th{background:#000;color:#fff;font-weight:normal}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:40px;border-top:1px solid #000;padding-top:14px}
+.pager a{border:1px solid #000;padding:6px 14px;text-decoration:none}
+.pager a:hover{background:#000;color:#fff}
+pre.lic{white-space:pre-wrap;border:1px solid #000;padding:10px;font-size:13px;font-family:Consolas,monospace}
+@media(max-width:800px){.layout{display:block}nav.side{width:auto;height:auto;position:static;border-right:0;border-bottom:1px solid #000}main{padding:20px 16px 50px}}
+figure.code figcaption a{color:#fff}
+.ref{font-size:14px;margin:4px 0 0}

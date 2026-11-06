@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class=""><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class=""><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class=""><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class=""><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class=""><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class=""><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class=""><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class="cur"><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class=""><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class=""><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class=""><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class=""><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class=""><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class=""><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class=""><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class=""><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<p class="ch">บทที่ 7 จาก 15</p>
+<h1>โมเดลและไมเกรชัน (models x migrations)</h1>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider/tree/07-models-migrations" target="_blank" rel="noopener">บรานช์ 07-models-migrations</a> · <a href="https://github.com/potchangelo/django-junraider/compare/06-templates-filters...07-models-migrations" target="_blank" rel="noopener">ส่วนที่เปลี่ยนจากบทก่อนหน้า</a></p>
+<h2>วัตถุประสงค์</h2>
+<p>เมื่อจบบทนี้ ผู้เรียนเชื่อมต่อโปรเจกต์กับฐานข้อมูล PostgreSQL ผ่านโปรแกรม pgAdmin ประกาศโมเดล (Model) ของเมนูอาหาร (<code>Food</code>) และผู้ลงทะเบียนรับโปรโมชั่น (<code>Subscription</code>) และสร้างตารางในฐานข้อมูลด้วยไมเกรชัน (Migration) ได้</p>
+<h2>ขั้นตอนที่ 1 ทำความเข้าใจโมเดลและไมเกรชัน</h2>
+<ul>
+<li>ฐานข้อมูล (Database) คือที่เก็บข้อมูลของเว็บอย่างเป็นระบบในรูปของตาราง (Table) ที่มีแถว (Row) และคอลัมน์ (Column) ตั้งแต่บทนี้ โปรเจกต์ใช้ PostgreSQL เป็นระบบจัดการฐานข้อมูล และใช้ pgAdmin ซึ่งเป็นโปรแกรมหน้าต่างสำหรับสร้างและดูฐานข้อมูล</li>
+<li>โมเดล (Model) คือคลาส Python ที่ระบุโครงสร้างข้อมูลหนึ่งชนิด Django แปลงโมเดลหนึ่งคลาสเป็นตารางหนึ่งตาราง และแปลงฟิลด์ (Field) แต่ละตัวเป็นคอลัมน์</li>
+<li>ไมเกรชัน (Migration) คือไฟล์ที่ Django สร้างขึ้นเพื่อบันทึกการเปลี่ยนแปลงของโมเดล และใช้สั่งให้ฐานข้อมูลเปลี่ยนโครงสร้างตาม ทำให้ไม่ต้องเขียนคำสั่ง SQL (ภาษาที่ใช้สั่งงานฐานข้อมูล) สร้างตารางเอง</li>
+</ul>
+<h2>ขั้นตอนที่ 2 ติดตั้ง PostgreSQL และ pgAdmin</h2>
+<p>ดาวน์โหลดตัวติดตั้ง PostgreSQL สำหรับ Windows จาก https://www.postgresql.org/download/windows/ ตัวติดตั้งมีให้เลือกติดตั้ง PostgreSQL Server และ pgAdmin 4 พร้อมกัน ระหว่างติดตั้งจะให้ตั้งรหัสผ่านของผู้ใช้ <code>postgres</code> ซึ่งเป็นผู้ดูแลระบบของ PostgreSQL และกำหนดพอร์ต (Port) ให้ใช้ค่าเริ่มต้น <code>5432</code> ให้จดรหัสผ่านไว้</p>
+<h2>ขั้นตอนที่ 3 สร้างฐานข้อมูลด้วย pgAdmin</h2>
+<ul>
+<li>เปิดโปรแกรม pgAdmin 4 (หากมีการให้ตั้ง Master Password ในการเปิดครั้งแรก ให้ตั้งรหัสผ่านสำหรับ pgAdmin เอง)</li>
+<li>ในแผงด้านซ้าย ขยาย Servers แล้วคลิกเซิร์ฟเวอร์ที่ติดตั้งไว้ (ชื่อ PostgreSQL ตามด้วยเลขเวอร์ชัน เช่น PostgreSQL 17) กรอกรหัสผ่านของผู้ใช้ <code>postgres</code> ที่ตั้งตอนติดตั้ง</li>
+<li>คลิกขวาที่ Databases เลือก Create แล้วเลือก Database…</li>
+<li>ในช่อง Database พิมพ์ <code>django_junraider</code> แล้วกด Save</li>
+<li>ฐานข้อมูล <code>django_junraider</code> จะปรากฏใต้ Databases</li>
+</ul>
+<p>ชื่อ <code>django_junraider</code> ต้องตรงกับค่า <code>NAME</code> ที่ตั้งใน <code>settings.py</code> ในขั้นตอนที่ 5</p>
+<h2>ขั้นตอนที่ 4 ติดตั้งตัวเชื่อมต่อ PostgreSQL สำหรับ Python</h2>
+<p>Django ต้องใช้แพ็กเกจเชื่อมต่อกับ PostgreSQL (เรียกว่า Driver) ให้กลับไปที่เทอร์มินัลในสภาพแวดล้อมเสมือนของโปรเจกต์ (โฟลเดอร์ <code>django-junraider</code> ที่ทำ <code>pipenv shell</code> แล้ว) แล้วติดตั้ง</p>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>pipenv install psycopg2-binary</code></pre></figure>
+<p><code>psycopg2</code> คือตัวเชื่อมต่อ PostgreSQL ที่ Django ใช้ ส่วนชื่อที่ลงท้ายด้วย <code>-binary</code> คือรุ่นที่สร้างสำเร็จรูปมาแล้ว จึงไม่ต้องติดตั้งตัวแปลภาษา C เพิ่ม</p>
+<h2>ขั้นตอนที่ 5 ตั้งค่าฐานข้อมูลใน settings.py</h2>
+<p>เปิดไฟล์ <code>project_jrd/settings.py</code> หา <code>DATABASES</code> ซึ่งเดิมใช้ SQLite (ฐานข้อมูลแบบไฟล์ที่ Django ตั้งให้) แล้วแทนที่ด้วยโค้ดนี้</p>
+<figure class="code"><figcaption><span>project_jrd/settings.py (ส่วนที่แก้)</span><button type="button">คัดลอก</button></figcaption><pre><code>DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'django_junraider',
+        'USER': 'postgres',
+        'PASSWORD': 'password1234',
+        'HOST': '127.0.0.1',
+        'PORT': '5432'
+    }
+}</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>'ENGINE': 'django.db.backends.postgresql'</code></td><td>ตัวเชื่อมต่อฐานข้อมูลที่ Django มีให้สำหรับ PostgreSQL (ใช้ <code>psycopg2</code> ที่ติดตั้งในขั้นตอนที่ 4)</td></tr>
+<tr><td><code>'NAME': 'django_junraider'</code></td><td>ชื่อฐานข้อมูลที่สร้างในขั้นตอนที่ 3</td></tr>
+<tr><td><code>'USER': 'postgres'</code></td><td>ชื่อผู้ใช้ PostgreSQL</td></tr>
+<tr><td><code>'PASSWORD': 'password1234'</code></td><td>รหัสผ่านของผู้ใช้ ให้เปลี่ยนเป็นรหัสผ่านที่ตั้งไว้ตอนติดตั้ง PostgreSQL ของตนเอง</td></tr>
+<tr><td><code>'HOST': '127.0.0.1'</code></td><td>ที่อยู่ของเครื่องที่รัน PostgreSQL ในที่นี้คือเครื่องของตนเอง</td></tr>
+<tr><td><code>'PORT': '5432'</code></td><td>หมายเลขพอร์ตของ PostgreSQL ที่กำหนดตอนติดตั้ง</td></tr>
+</tbody></table>
+<p>การเขียนรหัสผ่านในไฟล์โค้ดไม่ปลอดภัย บทที่ 14 จะย้ายค่าเหล่านี้ไปไว้ในไฟล์ <code>.env</code></p>
+<h2>ขั้นตอนที่ 6 ประกาศโมเดล Food</h2>
+<p>แทนที่เนื้อหาทั้งไฟล์ <code>app_foods/models.py</code> ด้วยโค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/07-models-migrations/app_foods/models.py" target="_blank" rel="noopener">app_foods/models.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.db import models
+
+# Create your models here.
+
+class Food(models.Model):
+    title = models.CharField(max_length=60)
+    price = models.IntegerField()
+    special_price = models.IntegerField(null=True)
+    is_premium = models.BooleanField(default=False)
+    promotion_end_at = models.DateTimeField(null=True)
+    description = models.TextField(null=True)</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>class Food(models.Model):</code></td><td>ประกาศโมเดลชื่อ <code>Food</code> โดยรับคุณสมบัติจาก <code>models.Model</code> ของ Django ตารางที่ได้ชื่อ <code>app_foods_food</code> (ชื่อแอป + ชื่อโมเดลตัวพิมพ์เล็ก)</td></tr>
+<tr><td><code>title = models.CharField(max_length=60)</code></td><td>ฟิลด์ข้อความสั้น <code>max_length</code> คือจำนวนตัวอักษรสูงสุด</td></tr>
+<tr><td><code>price = models.IntegerField()</code></td><td>ฟิลด์จำนวนเต็ม</td></tr>
+<tr><td><code>special_price = models.IntegerField(null=True)</code></td><td>จำนวนเต็มที่ <code>null=True</code> อนุญาตให้ไม่มีค่า (เก็บเป็น NULL ในฐานข้อมูล) เหมาะกับเมนูที่ไม่มีราคาพิเศษ</td></tr>
+<tr><td><code>is_premium = models.BooleanField(default=False)</code></td><td>ฟิลด์บูลีน <code>default=False</code> คือค่าเริ่มต้นเมื่อไม่ระบุ</td></tr>
+<tr><td><code>promotion_end_at = models.DateTimeField(null=True)</code></td><td>ฟิลด์วันที่และเวลา อนุญาตให้ไม่มีค่า</td></tr>
+<tr><td><code>description = models.TextField(null=True)</code></td><td>ฟิลด์ข้อความยาว อนุญาตให้ไม่มีค่า</td></tr>
+</tbody></table>
+<p>Django เพิ่มคอลัมน์ <code>id</code> ให้เองในทุกโมเดล เป็นจำนวนเต็มที่เพิ่มค่าอัตโนมัติและเป็นคีย์หลัก (Primary Key) ซึ่งใช้ระบุแถวแต่ละแถวไม่ให้ซ้ำกัน ชนิดของคอลัมน์นี้ตามค่า <code>default_auto_field</code> ใน <code>apps.py</code> ที่เห็นในบทที่ 2</p>
+<h2>ขั้นตอนที่ 7 ประกาศโมเดล Subscription</h2>
+<p>แทนที่เนื้อหาทั้งไฟล์ <code>app_general/models.py</code> ด้วยโค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/07-models-migrations/app_general/models.py" target="_blank" rel="noopener">app_general/models.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.db import models
+
+# Create your models here.
+
+class Subscription(models.Model):
+    STATUS = [
+        ('unapproved', 'Unapproved'),
+        ('banned', 'Banned'),
+        ('approved', 'Approved')
+    ]
+
+    name = models.CharField(max_length=50)
+    email = models.EmailField(max_length=50, unique=True)
+    status = models.CharField(max_length=15, choices=STATUS, default='unapproved')
+    registered_at = models.DateTimeField(auto_now_add=True)</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>STATUS = [ ('unapproved', 'Unapproved'), ... ]</code></td><td>รายการตัวเลือกของสถานะ แต่ละตัวเลือกเป็นคู่ (ค่าที่เก็บในฐานข้อมูล, ข้อความที่แสดงให้ผู้ใช้เห็น)</td></tr>
+<tr><td><code>email = models.EmailField(max_length=50, unique=True)</code></td><td>ฟิลด์อีเมล ตรวจรูปแบบอีเมล และ <code>unique=True</code> ห้ามมีอีเมลซ้ำกันในตาราง</td></tr>
+<tr><td><code>status = models.CharField(max_length=15, choices=STATUS, default='unapproved')</code></td><td>ฟิลด์ข้อความที่เลือกได้เฉพาะค่าใน <code>STATUS</code> ค่าเริ่มต้นคือ <code>unapproved</code></td></tr>
+<tr><td><code>registered_at = models.DateTimeField(auto_now_add=True)</code></td><td>ฟิลด์วันที่และเวลาที่ Django ใส่เวลาปัจจุบันให้อัตโนมัติเมื่อสร้างแถวใหม่</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 8 สร้างไฟล์ไมเกรชัน</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py makemigrations</code></pre></figure>
+<figure class="code out"><figcaption><span>ผลลัพธ์ที่ควรเห็น</span></figcaption><pre><code>Migrations for 'app_foods':
+  app_foods\migrations\0001_initial.py
+    - Create model Food
+Migrations for 'app_general':
+  app_general\migrations\0001_initial.py
+    - Create model Subscription</code></pre></figure>
+<p>ผลลัพธ์ตัวอย่างมาจาก Windows บน macOS และ Linux เส้นทางไฟล์ใช้เครื่องหมาย <code>/</code> แทน <code>\</code></p>
+<p>คำสั่ง <code>makemigrations</code> เปรียบเทียบโมเดลปัจจุบันกับไมเกรชันเดิม แล้วสร้างไฟล์ไมเกรชันใหม่ในโฟลเดอร์ <code>migrations</code> ของแต่ละแอป ตัวอย่างไฟล์ <code>app_foods/migrations/0001_initial.py</code> ที่ได้</p>
+<figure class="code"><figcaption><span>app_foods/migrations/0001_initial.py</span></figcaption><pre><code># Generated by Django 4.0.10 on 2026-11-05 04:49
+
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='Food',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('title', models.CharField(max_length=60)),
+                ('price', models.IntegerField()),
+                ('special_price', models.IntegerField(null=True)),
+                ('is_premium', models.BooleanField(default=False)),
+                ('promotion_end_at', models.DateTimeField(null=True)),
+                ('description', models.TextField(null=True)),
+            ],
+        ),
+    ]</code></pre></figure>
+<p>ไฟล์นี้ Django สร้างให้ ไม่ต้องแก้ไข บรรทัดแรกบอกเวอร์ชัน Django และเวลาที่สร้าง ซึ่งของผู้เรียนจะต่างจากตัวอย่าง <code>CreateModel</code> คือการสร้างตารางของโมเดล <code>Food</code> และ <code>fields</code> คือรายการคอลัมน์ ซึ่งมี <code>id</code> ที่ Django เพิ่มให้</p>
+<h2>ขั้นตอนที่ 9 สั่งให้ฐานข้อมูลเปลี่ยนตามไมเกรชัน</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py migrate</code></pre></figure>
+<figure class="code out"><figcaption><span>ผลลัพธ์ที่ควรเห็น</span></figcaption><pre><code>Operations to perform:
+  Apply all migrations: admin, app_foods, app_general, auth, contenttypes, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying app_foods.0001_initial... OK
+  Applying app_general.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying sessions.0001_initial... OK</code></pre></figure>
+<p>คำสั่ง <code>migrate</code> นำไมเกรชันที่ยังไม่ได้ใช้ทั้งหมดไปสร้างตารางในฐานข้อมูล รวมถึงไมเกรชันของแอปที่มากับ Django (<code>admin</code>, <code>auth</code>, <code>contenttypes</code>, <code>sessions</code>) ซึ่งเป็นสาเหตุของข้อความ <code>18 unapplied migration(s)</code> ที่เห็นตอน <code>runserver</code> ในบทที่ 1 จำนวนและลำดับบรรทัดอาจต่างจากตัวอย่างเล็กน้อย</p>
+<h2>ขั้นตอนที่ 10 ตรวจสอบตารางใน pgAdmin</h2>
+<ul>
+<li>ใน pgAdmin ขยาย Servers > PostgreSQL (เลขเวอร์ชัน) > Databases > django_junraider > Schemas > public > Tables (ถ้าไม่เห็นตาราง ให้คลิกขวาที่ Tables แล้วเลือก Refresh)</li>
+<li>ตาราง <code>app_foods_food</code> และ <code>app_general_subscription</code> ปรากฏในรายการ</li>
+<li>คลิกขวาที่ตาราง <code>app_foods_food</code> เลือก Properties แล้วเปิดแท็บ Columns เพื่อดูคอลัมน์ หรือเลือก View/Edit Data > All Rows เพื่อดูข้อมูลในตาราง (ตอนนี้ยังไม่มีข้อมูล)</li>
+</ul>
+<h2>ผลลัพธ์ที่ควรได้</h2>
+<ul>
+<li>ใน pgAdmin ฐานข้อมูล <code>django_junraider</code> มีตาราง <code>app_foods_food</code> และ <code>app_general_subscription</code> รวมกับตารางของ Django เช่น <code>auth_user</code> และ <code>django_session</code> รวม 12 ตาราง</li>
+<li>ตาราง <code>app_foods_food</code> มีคอลัมน์ <code>id</code>, <code>title</code>, <code>price</code>, <code>special_price</code>, <code>is_premium</code>, <code>promotion_end_at</code>, <code>description</code> โดยคอลัมน์ <code>special_price</code>, <code>promotion_end_at</code>, <code>description</code> อนุญาตให้ไม่มีค่า</li>
+<li>ครั้งต่อไปที่รัน <code>python manage.py runserver</code> จะไม่มีข้อความเตือน <code>unapplied migration(s)</code> อีก</li>
+</ul>
+<h2>โครงสร้างไฟล์หลังจบบท</h2>
+<p>แสดงเฉพาะไฟล์ที่เพิ่มหรือแก้ในบทนี้ (+ คือไฟล์ที่สร้างใหม่, * คือไฟล์ที่แก้ไข)</p>
+<figure class="code"><figcaption><span>django-junraider/</span></figcaption><pre><code>django-junraider/
+├── Pipfile                         *
+├── Pipfile.lock                    *
+├── app_foods/
+│   ├── migrations/
+│   │   └── 0001_initial.py         +
+│   └── models.py                   *
+├── app_general/
+│   ├── migrations/
+│   │   └── 0001_initial.py         +
+│   └── models.py                   *
+└── project_jrd/
+    └── settings.py                 *</code></pre></figure>
+<div class="pager"><a href="ch06.html">&larr; บทก่อนหน้า: บทที่ 6</a><a href="ch08.html">บทถัดไป: บทที่ 8 &rarr;</a></div></main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

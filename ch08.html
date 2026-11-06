@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 8 โมเดล (models)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class=""><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class=""><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class=""><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class=""><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class=""><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class=""><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class=""><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class=""><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class="cur"><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class=""><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class=""><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class=""><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class=""><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class=""><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class=""><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class=""><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<p class="ch">บทที่ 8 จาก 15</p>
+<h1>โมเดล (models)</h1>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider/tree/08-models" target="_blank" rel="noopener">บรานช์ 08-models</a> · <a href="https://github.com/potchangelo/django-junraider/compare/07-models-migrations...08-models" target="_blank" rel="noopener">ส่วนที่เปลี่ยนจากบทก่อนหน้า</a></p>
+<h2>วัตถุประสงค์</h2>
+<p>เมื่อจบบทนี้ ผู้เรียนสร้างความสัมพันธ์แบบหลายต่อหลาย (Many-to-Many) ระหว่างผู้ลงทะเบียนกับเมนู และใช้ชุดคำสั่งของโมเดลใน Django Shell เพื่อเพิ่ม ค้นหา แก้ไข และลบข้อมูลในฐานข้อมูลได้ ข้อมูลเมนู 5 รายการที่สร้างในบทนี้จะใช้แสดงผลในบทที่ 9</p>
+<h2>ขั้นตอนที่ 1 เพิ่มความสัมพันธ์ระหว่างโมเดล</h2>
+<p>ผู้ลงทะเบียนหนึ่งคนเลือกเมนูที่สนใจได้หลายเมนู และเมนูหนึ่งมีผู้สนใจได้หลายคน ความสัมพันธ์แบบนี้เรียกว่า Many-to-Many เปิดไฟล์ <code>app_general/models.py</code> แล้วเพิ่มบรรทัดสุดท้ายในคลาส <code>Subscription</code></p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/08-models/app_general/models.py" target="_blank" rel="noopener">app_general/models.py (ส่วนที่เพิ่ม ต่อจากฟิลด์ registered_at)</a></span><button type="button">คัดลอก</button></figcaption><pre><code>    food_set = models.ManyToManyField('app_foods.Food')</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>models.ManyToManyField('app_foods.Food')</code></td><td>ฟิลด์ความสัมพันธ์แบบหลายต่อหลายไปยังโมเดล <code>Food</code> ของแอป <code>app_foods</code> ระบุเป็นข้อความ <code>'ชื่อแอป.ชื่อโมเดล'</code> เพราะโมเดลอยู่คนละแอป</td></tr>
+<tr><td><code>food_set</code></td><td>ชื่อฟิลด์ ใช้เข้าถึงเมนูทั้งหมดที่ผู้ลงทะเบียนคนนั้นเลือก</td></tr>
+</tbody></table>
+<p>ฟิลด์นี้ไม่ได้เพิ่มคอลัมน์ในตาราง <code>app_general_subscription</code> แต่ Django สร้างตารางกลางอีกหนึ่งตาราง เพื่อเก็บคู่ของผู้ลงทะเบียนกับเมนู</p>
+<h2>ขั้นตอนที่ 2 สร้างและใช้ไมเกรชัน</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py makemigrations
+python manage.py migrate</code></pre></figure>
+<figure class="code out"><figcaption><span>ผลลัพธ์ที่ควรเห็น</span></figcaption><pre><code>Migrations for 'app_general':
+  app_general\migrations\0002_subscription_food_set.py
+    - Add field food_set to subscription
+Operations to perform:
+  Apply all migrations: admin, app_foods, app_general, auth, contenttypes, sessions
+Running migrations:
+  Applying app_general.0002_subscription_food_set... OK</code></pre></figure>
+<p>ตารางกลางที่ได้ชื่อ <code>app_general_subscription_food_set</code> มีคอลัมน์ <code>subscription_id</code> และ <code>food_id</code> ซึ่งเก็บ id ของผู้ลงทะเบียนและของเมนูตามลำดับ</p>
+<h2>ขั้นตอนที่ 3 เปิด Django Shell</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py shell</code></pre></figure>
+<p>คำสั่งนี้เปิดโปรแกรมโต้ตอบของ Python (Shell) ที่โหลดการตั้งค่าของโปรเจกต์แล้ว จึงเรียกใช้โมเดลและเชื่อมต่อฐานข้อมูลได้ ตัวอย่างในขั้นตอนต่อไปแสดงบรรทัดที่ผู้เรียนพิมพ์โดยขึ้นต้นด้วย <code>&gt;&gt;&gt;</code> ส่วนบรรทัดถัดไปที่ไม่มี <code>&gt;&gt;&gt;</code> คือผลที่ Shell แสดง พิมพ์เฉพาะส่วนหลัง <code>&gt;&gt;&gt; </code> แล้วกด Enter ทีละบรรทัด และออกจาก Shell ด้วย <code>exit()</code></p>
+<h2>ขั้นตอนที่ 4 นำโมเดลเข้ามาและเพิ่มข้อมูล</h2>
+<figure class="code"><figcaption><span>Python Shell</span></figcaption><pre><code>&gt;&gt;&gt; from app_foods.models import Food
+&gt;&gt;&gt; from app_general.models import Subscription
+&gt;&gt;&gt; Food.objects.all()
+&lt;QuerySet []&gt;
+&gt;&gt;&gt; food1 = Food(title='Red Spicy', price=2990)
+&gt;&gt;&gt; food1.save()
+&gt;&gt;&gt; food1.id
+1
+&gt;&gt;&gt; Food.objects.all()
+&lt;QuerySet [&lt;Food: Food object (1)&gt;]&gt;
+&gt;&gt;&gt; Food.objects.create(title='Blue Glacier', description='เย็นสดชื่น ราวกับธารน้ำแข็ง', price=2990)
+&lt;Food: Food object (2)&gt;
+&gt;&gt;&gt; Food.objects.create(title='Yellow Sunrise', description='หอมหวานสดใส เหมือนแสงแรกยามเช้า', price=2990, special_price=2490)
+&lt;Food: Food object (3)&gt;
+&gt;&gt;&gt; Food.objects.create(title='Dark Choco Premium', description='ช็อกโกแลตเข้มข้น สำหรับคนรักความเข้ม', price=3990, is_premium=True)
+&lt;Food: Food object (4)&gt;
+&gt;&gt;&gt; Food.objects.create(title='White Choco Premium', description='ช็อกโกแลตขาวนุ่มละมุน', price=3990, is_premium=True)
+&lt;Food: Food object (5)&gt;</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>from app_foods.models import Food</code></td><td>นำโมเดลเข้ามาใช้ Shell ไม่นำเข้าให้เอง</td></tr>
+<tr><td><code>Food.objects</code></td><td>เมเนเจอร์ (Manager) ของโมเดล ใช้ทำงานกับตารางทั้งตาราง Django เพิ่มให้ทุกโมเดลโดยอัตโนมัติ</td></tr>
+<tr><td><code>Food.objects.all()</code></td><td>ดึงข้อมูลทุกแถว ผลเป็น QuerySet ซึ่งเป็นกลุ่มของออบเจกต์โมเดล ตอนนี้ว่างเปล่า</td></tr>
+<tr><td><code>food1 = Food(title='Red Spicy', price=2990)</code></td><td>สร้างออบเจกต์ <code>Food</code> ในหน่วยความจำ ยังไม่ถูกบันทึกในฐานข้อมูล</td></tr>
+<tr><td><code>food1.save()</code></td><td>บันทึกลงฐานข้อมูล Django ใส่ <code>id</code> ให้ ซึ่งเรียกดูได้ด้วย <code>food1.id</code></td></tr>
+<tr><td><code>Food.objects.create(...)</code></td><td>สร้างและบันทึกในคำสั่งเดียว ผลที่ Shell แสดงคือออบเจกต์ที่สร้าง</td></tr>
+<tr><td><code>&lt;Food: Food object (1)&gt;</code></td><td>รูปแบบการแสดงออบเจกต์ตามค่าเริ่มต้น คือชื่อโมเดลและ id ซึ่งไม่สื่อความหมาย บทที่ 11 จะเปลี่ยนให้แสดงชื่อเมนู</td></tr>
+</tbody></table>
+<p>เมนูที่สร้างทั้ง 5 รายการ ได้แก่ Red Spicy, Blue Glacier, Yellow Sunrise (มีราคาพิเศษ 2490), Dark Choco Premium และ White Choco Premium (สองรายการหลังเป็นเมนูพิเศษ) การระบุ <code>description='...'</code> ใน <code>create</code> คือคีย์เวิร์ดอาร์กิวเมนต์ (Keyword Argument) ซึ่งกำหนดค่าให้ฟิลด์ตามชื่อ ฟิลด์ที่ไม่ระบุจะได้ค่าเริ่มต้น (<code>null</code> หรือ <code>default</code>)</p>
+<h2>ขั้นตอนที่ 5 ค้นหาข้อมูล</h2>
+<figure class="code"><figcaption><span>Python Shell</span></figcaption><pre><code>&gt;&gt;&gt; Food.objects.count()
+5
+&gt;&gt;&gt; Food.objects.get(id=1)
+&lt;Food: Food object (1)&gt;
+&gt;&gt;&gt; Food.objects.get(id=1).title
+'Red Spicy'
+&gt;&gt;&gt; Food.objects.filter(is_premium=True)
+&lt;QuerySet [&lt;Food: Food object (4)&gt;, &lt;Food: Food object (5)&gt;]&gt;
+&gt;&gt;&gt; Food.objects.filter(price__gte=3000)
+&lt;QuerySet [&lt;Food: Food object (4)&gt;, &lt;Food: Food object (5)&gt;]&gt;
+&gt;&gt;&gt; Food.objects.filter(title__icontains='choco').count()
+2
+&gt;&gt;&gt; Food.objects.exclude(is_premium=True).count()
+3
+&gt;&gt;&gt; Food.objects.order_by('-price', 'title')
+&lt;QuerySet [&lt;Food: Food object (4)&gt;, &lt;Food: Food object (5)&gt;, &lt;Food: Food object (2)&gt;, &lt;Food: Food object (1)&gt;, &lt;Food: Food object (3)&gt;]&gt;</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>Food.objects.count()</code></td><td>นับจำนวนแถว</td></tr>
+<tr><td><code>Food.objects.get(id=1)</code></td><td>ดึงแถวเดียวที่ <code>id</code> เท่ากับ 1 ถ้าไม่พบ จะเกิดข้อผิดพลาด <code>Food.DoesNotExist</code> ถ้าพบมากกว่าหนึ่งแถวจะเกิดข้อผิดพลาด <code>MultipleObjectsReturned</code></td></tr>
+<tr><td><code>.title</code></td><td>เข้าถึงค่าฟิลด์ของออบเจกต์</td></tr>
+<tr><td><code>Food.objects.filter(is_premium=True)</code></td><td>คัดเฉพาะแถวที่เงื่อนไขเป็นจริง</td></tr>
+<tr><td><code>price__gte=3000</code></td><td>เงื่อนไขแบบมีส่วนต่อท้ายหลังเครื่องหมาย <code>__</code> คือ Field Lookup โดย <code>gte</code> หมายถึง มากกว่าหรือเท่ากับ (greater than or equal)</td></tr>
+<tr><td><code>title__icontains='choco'</code></td><td><code>icontains</code> หมายถึง มีข้อความนี้อยู่ในฟิลด์ โดยไม่สนตัวพิมพ์เล็กพิมพ์ใหญ่</td></tr>
+<tr><td><code>Food.objects.exclude(is_premium=True)</code></td><td>ตรงข้ามกับ <code>filter</code> คือตัดแถวที่ตรงเงื่อนไขออก</td></tr>
+<tr><td><code>order_by('-price', 'title')</code></td><td>เรียงลำดับ เครื่องหมาย <code>-</code> นำหน้าหมายถึงเรียงจากมากไปน้อย ถ้าราคาเท่ากันให้เรียงตาม <code>title</code></td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 6 แก้ไขและลบข้อมูล</h2>
+<figure class="code"><figcaption><span>Python Shell</span></figcaption><pre><code>&gt;&gt;&gt; food1.description = 'เผ็ดจัดจ้านด้วยพริกสามสี'
+&gt;&gt;&gt; food1.save()
+&gt;&gt;&gt; Food.objects.get(id=1).description
+'เผ็ดจัดจ้านด้วยพริกสามสี'
+&gt;&gt;&gt; from django.utils import timezone
+&gt;&gt;&gt; from datetime import timedelta
+&gt;&gt;&gt; Food.objects.filter(id=3).update(special_price=2490, promotion_end_at=timezone.now() + timedelta(days=30))
+1
+&gt;&gt;&gt; temp = Food.objects.create(title='ทดสอบ', price=1)
+&gt;&gt;&gt; temp.delete()
+(1, {'app_foods.Food': 1})
+&gt;&gt;&gt; Food.objects.count()
+5</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>food1.description = '...'</code></td><td>เปลี่ยนค่าฟิลด์ในหน่วยความจำ</td></tr>
+<tr><td><code>food1.save()</code></td><td>บันทึกการเปลี่ยนแปลงลงฐานข้อมูล ออบเจกต์ที่มี <code>id</code> อยู่แล้วจะถูกแก้ไขแถวเดิม</td></tr>
+<tr><td><code>Food.objects.filter(id=3).update(...)</code></td><td>แก้หลายฟิลด์ของทุกแถวที่ตรงเงื่อนไขในคำสั่งเดียว ผลคือจำนวนแถวที่แก้ (1) ในที่นี้ตั้งราคาพิเศษและวันสิ้นสุดโปรโมชั่นเป็น 30 วันนับจากเวลาปัจจุบัน</td></tr>
+<tr><td><code>timezone.now() + timedelta(days=30)</code></td><td><code>timezone.now()</code> คือเวลาปัจจุบัน และ <code>timedelta(days=30)</code> คือช่วงเวลา 30 วัน</td></tr>
+<tr><td><code>temp.delete()</code></td><td>ลบแถวนั้นออกจากฐานข้อมูล ผลคือจำนวนแถวที่ลบและรายละเอียดแยกตามโมเดล</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 7 ใช้ความสัมพันธ์แบบหลายต่อหลาย</h2>
+<figure class="code"><figcaption><span>Python Shell</span></figcaption><pre><code>&gt;&gt;&gt; somchai = Subscription.objects.create(name='สมชาย ใจดี', email='somchai@example.com')
+&gt;&gt;&gt; somchai.status
+'unapproved'
+&gt;&gt;&gt; somchai.food_set.add(Food.objects.get(id=1), Food.objects.get(id=4))
+&gt;&gt;&gt; somchai.food_set.all()
+&lt;QuerySet [&lt;Food: Food object (4)&gt;, &lt;Food: Food object (1)&gt;]&gt;
+&gt;&gt;&gt; Food.objects.get(id=1).subscription_set.all()
+&lt;QuerySet [&lt;Subscription: Subscription object (1)&gt;]&gt;
+&gt;&gt;&gt; somchai.food_set.count()
+2
+&gt;&gt;&gt; somchai.delete()
+(3, {'app_general.Subscription_food_set': 2, 'app_general.Subscription': 1})
+&gt;&gt;&gt; Subscription.objects.count()
+0</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>Subscription.objects.create(name=..., email=...)</code></td><td>สร้างผู้ลงทะเบียน ฟิลด์ <code>status</code> ได้ค่าเริ่มต้น <code>'unapproved'</code></td></tr>
+<tr><td><code>somchai.food_set.add(a, b)</code></td><td>เพิ่มเมนู 2 รายการให้ผู้ลงทะเบียน (บันทึกลงตารางกลาง)</td></tr>
+<tr><td><code>somchai.food_set.all()</code></td><td>ดึงเมนูทั้งหมดที่ผู้ลงทะเบียนคนนี้เลือก ถ้าไม่ใช้ <code>order_by</code> ลำดับของผลลัพธ์ไม่แน่นอน</td></tr>
+<tr><td><code>Food.objects.get(id=1).subscription_set.all()</code></td><td>ทิศทางกลับกัน: ดึงผู้ลงทะเบียนทั้งหมดที่เลือกเมนูนี้ Django สร้างชื่อ <code>subscription_set</code> ให้อัตโนมัติจากชื่อโมเดลที่มีฟิลด์ความสัมพันธ์</td></tr>
+<tr><td><code>somchai.delete()</code></td><td>ลบผู้ลงทะเบียนพร้อมแถวในตารางกลาง ไม่ลบเมนู</td></tr>
+</tbody></table>
+<p>ขั้นตอนสุดท้ายลบผู้ลงทะเบียนตัวอย่างออก เพื่อให้ตารางว่างก่อนบทที่ 10</p>
+<h2>ผลลัพธ์ที่ควรได้</h2>
+<ul>
+<li>ตารางเมนู <code>app_foods_food</code> มี 5 แถว (<code>Food.objects.count()</code> ได้ 5) โดย id 1 ถึง 5</li>
+<li>เมนู id 2 ถึง 5 มี <code>description</code> จากขั้นตอนที่ 4 เมนู id 1 ได้ <code>description</code> จากขั้นตอนที่ 6 และเมนู id 3 มีราคาพิเศษ 2490 กับวันสิ้นสุดโปรโมชั่น</li>
+<li>ตาราง <code>app_general_subscription</code> ว่าง</li>
+<li>เมนูที่สร้างเกิน (<code>ทดสอบ</code>) ถูกลบแล้ว</li>
+</ul>
+<h2>โครงสร้างไฟล์หลังจบบท</h2>
+<p>แสดงเฉพาะไฟล์ที่เพิ่มหรือแก้ในบทนี้ (+ คือไฟล์ที่สร้างใหม่, * คือไฟล์ที่แก้ไข)</p>
+<figure class="code"><figcaption><span>django-junraider/</span></figcaption><pre><code>django-junraider/
+└── app_general/
+    ├── migrations/
+    │   └── 0002_subscription_food_set.py   +
+    └── models.py                           *</code></pre></figure>
+<div class="pager"><a href="ch07.html">&larr; บทก่อนหน้า: บทที่ 7</a><a href="ch09.html">บทถัดไป: บทที่ 9 &rarr;</a></div></main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สื่อการสอน Django แบบทีละขั้น (อ้างอิง django-junraider)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class="cur"><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class=""><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class=""><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class=""><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class=""><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class=""><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class=""><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class=""><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class=""><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class=""><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class=""><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class=""><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class=""><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class=""><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class=""><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class=""><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<h1>สื่อการสอน Django แบบทีละขั้น</h1>
+<p class="ch">อ้างอิงโปรเจกต์ django-junraider (Season 1)</p>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider" target="_blank" rel="noopener">https://github.com/potchangelo/django-junraider</a> · <a href="https://github.com/potchangelo/django-junraider/tree/season-1" target="_blank" rel="noopener">โค้ดสมบูรณ์ของ Season 1 (บรานช์ season-1)</a></p>
+<h2>เกี่ยวกับสื่อนี้</h2>
+<p>สื่อนี้อธิบายการสร้างเว็บไซต์ด้วย Django ทีละขั้นตอนสำหรับผู้ที่ไม่มีพื้นฐาน โดยสร้างเว็บไซต์ขายไอศกรีมชื่อ จันทร์ไรเดอร์ ตามโค้ดของโปรเจกต์ django-junraider ใน Season 1 ซึ่งมี 15 บทเรียน แต่ละบทมีโครงเหมือนกัน คือ วัตถุประสงค์ ขั้นตอน ผลลัพธ์ที่ควรได้ และโครงสร้างไฟล์หลังจบบท และมีลิงก์ไปบรานช์ของบทนั้นในรีโพสิตอรีบน GitHub ที่ด้านบนของทุกบท</p>
+<h2>คำที่พบในทุกบท</h2>
+<ul>
+<li>Git คือโปรแกรมที่บันทึกประวัติการแก้ไขโค้ด ทำให้ย้อนดูหรือย้อนกลับไปยังโค้ดก่อนหน้าได้</li>
+<li>GitHub คือเว็บไซต์สำหรับเก็บและเผยแพร่โค้ดที่บันทึกด้วย Git</li>
+<li>รีโพสิตอรี (Repository) คือที่เก็บโค้ดของโปรเจกต์หนึ่งโปรเจกต์บน GitHub</li>
+<li>บรานช์ (Branch) คือสายการพัฒนาโค้ดแยกกันภายในรีโพสิตอรีเดียว รีโพสิตอรี django-junraider มีบรานช์ 1 บรานช์ต่อ 1 บท เช่น บรานช์ <code>03-urls-views</code> เก็บโค้ดที่เสร็จหลังจบบทที่ 3 ลิงก์ อ้างอิง GitHub ที่ด้านบนของแต่ละบทและที่หัวกล่องโค้ดจึงเปิดไฟล์ของบรานช์ประจำบทนั้น</li>
+</ul>
+<h2>เครื่องมือที่ใช้</h2>
+<ul>
+<li>Python 3.10</li>
+<li>Django 4.0</li>
+<li>pipenv สำหรับสร้างสภาพแวดล้อมเสมือนและจัดการแพ็กเกจ</li>
+<li>PostgreSQL เป็นฐานข้อมูล และ pgAdmin สำหรับสร้างและดูฐานข้อมูล (เริ่มใช้ตั้งแต่บทที่ 7)</li>
+<li>GitHub และ Render สำหรับนำเว็บขึ้นใช้งานจริง (บทที่ 15)</li>
+</ul>
+<h2>สารบัญ</h2>
+<table class="toc"><thead><tr><th>บท</th><th>หัวข้อ</th><th>บรานช์อ้างอิงบน GitHub</th></tr></thead><tbody>
+<tr><td>1</td><td><a href="ch01.html">การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></td><td><a href="https://github.com/potchangelo/django-junraider/tree/01-setup" target="_blank" rel="noopener">01-setup</a></td></tr>
+<tr><td>2</td><td><a href="ch02.html">โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></td><td><a href="https://github.com/potchangelo/django-junraider/tree/02-project-apps" target="_blank" rel="noopener">02-project-apps</a></td></tr>
+<tr><td>3</td><td><a href="ch03.html">เส้นทางและวิว (urls x views)</a></td><td><a href="https://github.com/potchangelo/django-junraider/tree/03-urls-views" target="_blank" rel="noopener">03-urls-views</a></td></tr>
+<tr><td>4</td><td><a href="ch04.html">วิวและเทมเพลต (views x templates)</a></td><td><a href="https://github.com/potchangelo/django-junraider/tree/04-views-templates" target="_blank" rel="noopener">04-views-templates</a></td></tr>
+<tr><td>5</td><td><a href="ch05.html">แท็กในเทมเพลต (templates x tags)</a></td><td><a href="https://github.com/potchangelo/django-junraider/tree/05-templates-tags" target="_blank" rel="noopener">05-templates-tags</a></td></tr>
+<tr><td>6</td><td><a href="ch06.html">ตัวกรองในเทมเพลต (templates x filters)</a></td><td><a href="https://github.com/potchangelo/django-junraider/tree/06-templates-filters" target="_blank" rel="noopener">06-templates-filters</a></td></tr>
+<tr><td>7</td><td><a href="ch07.html">โมเดลและไมเกรชัน (models x migrations)</a></td><td><a href="https://github.com/potchangelo/django-junraider/tree/07-models-migrations" target="_blank" rel="noopener">07-models-migrations</a></td></tr>
+<tr><td>8</td><td><a href="ch08.html">โมเดล (models)</a></td><td><a href="https://github.com/potchangelo/django-junraider/tree/08-models" target="_blank" rel="noopener">08-models</a></td></tr>
+<tr><td>9</td><td><a href="ch09.html">โมเดล วิว และเทมเพลต</a></td><td><a href="https://github.com/potchangelo/django-junraider/tree/09-models-views-templates" target="_blank" rel="noopener">09-models-views-templates</a></td></tr>
+<tr><td>10</td><td><a href="ch10.html">แบบฟอร์ม วิว และเทมเพลต (forms)</a></td><td><a href="https://github.com/potchangelo/django-junraider/tree/10-forms-views-templates" target="_blank" rel="noopener">10-forms-views-templates</a></td></tr>
+<tr><td>11</td><td><a href="ch11.html">หน้าผู้ดูแลระบบ (admin)</a></td><td><a href="https://github.com/potchangelo/django-junraider/tree/11-admin" target="_blank" rel="noopener">11-admin</a></td></tr>
+<tr><td>12</td><td><a href="ch12.html">ไฟล์ภาพสแตติก (static images)</a></td><td><a href="https://github.com/potchangelo/django-junraider/tree/12-static-images" target="_blank" rel="noopener">12-static-images</a></td></tr>
+<tr><td>13</td><td><a href="ch13.html">ไฟล์ CSS และ JavaScript สแตติก</a></td><td><a href="https://github.com/potchangelo/django-junraider/tree/13-static-css-js" target="_blank" rel="noopener">13-static-css-js</a></td></tr>
+<tr><td>14</td><td><a href="ch14.html">การตั้งค่าและไฟล์ .env (settings x dotenv)</a></td><td><a href="https://github.com/potchangelo/django-junraider/tree/14-settings-dotenv" target="_blank" rel="noopener">14-settings-dotenv</a></td></tr>
+<tr><td>15</td><td><a href="ch15.html">การนำขึ้นใช้งานจริง (Deploy)</a></td><td><a href="https://github.com/potchangelo/django-junraider/tree/15-deploy-heroku" target="_blank" rel="noopener">15-deploy-heroku</a></td></tr>
+</tbody></table>
+<p>ที่มาของโค้ด ภาพ และเอกสารอ้างอิง ดูที่หน้า <a href="credits.html">ที่มา (Credits)</a></p>
+</main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class=""><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class="cur"><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class=""><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class=""><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class=""><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class=""><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class=""><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class=""><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class=""><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class=""><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class=""><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class=""><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class=""><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class=""><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class=""><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class=""><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<p class="ch">บทที่ 1 จาก 15</p>
+<h1>การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</h1>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider/tree/01-setup" target="_blank" rel="noopener">บรานช์ 01-setup</a></p>
+<h2>วัตถุประสงค์</h2>
+<p>เมื่อจบบทนี้ ผู้เรียนติดตั้ง Django เวอร์ชัน 4.0 ในสภาพแวดล้อมเสมือน (Virtual Environment) สร้างโปรเจกต์ (Project) ชื่อ <code>project_jrd</code> และเปิดเซิร์ฟเวอร์สำหรับพัฒนา (Development Server) เพื่อดูหน้าเว็บแรกในเบราว์เซอร์ (Browser) ได้</p>
+<p>Django คือเฟรมเวิร์ก (Framework) สำหรับสร้างเว็บไซต์ด้วยภาษา Python โดยเฟรมเวิร์กคือชุดโครงสร้างและเครื่องมือสำเร็จรูปที่ช่วยให้ไม่ต้องเขียนทุกส่วนของเว็บไซต์เอง ในบทนี้คำสั่งทั้งหมดพิมพ์ใน เทอร์มินัล (Terminal) ได้แก่ Command Prompt หรือ PowerShell บน Windows และ Terminal บน macOS หรือ Linux</p>
+<h2>ขั้นตอนที่ 1 ตรวจสอบ Python</h2>
+<p>Python คือภาษาโปรแกรมที่ใช้เขียน Django จึงต้องติดตั้ง Python ก่อน หากยังไม่มี ให้ดาวน์โหลดจาก https://www.python.org/downloads/ โดยเลือก Python 3.10 ซึ่งเป็นเวอร์ชันที่ Django 4.0 รองรับ และบน Windows ให้เลือกช่อง Add python.exe to PATH ในหน้าแรกของตัวติดตั้งก่อนกดติดตั้ง จากนั้นเปิดเทอร์มินัลแล้วพิมพ์คำสั่งตรวจสอบเวอร์ชัน</p>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python --version</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>python</code></td><td>เรียกใช้โปรแกรม Python</td></tr>
+<tr><td><code>--version</code></td><td>ตัวเลือก (Option) ที่สั่งให้แสดงเวอร์ชันแล้วจบการทำงาน</td></tr>
+</tbody></table>
+<figure class="code out"><figcaption><span>ผลลัพธ์ที่ควรเห็น (ตัวเลขท้ายอาจต่างกัน)</span></figcaption><pre><code>Python 3.10.11</code></pre></figure>
+<p>บน macOS และ Linux ให้ใช้ <code>python3 --version</code> และใช้ <code>python3</code> แทน <code>python</code> และ <code>pip3</code> แทน <code>pip</code> ในขั้นตอนที่ 2</p>
+<h2>ขั้นตอนที่ 2 ติดตั้ง pipenv</h2>
+<p><code>pip</code> คือโปรแกรมติดตั้งแพ็กเกจ (Package) ของ Python โดยแพ็กเกจคือชุดโค้ดที่ผู้อื่นเขียนไว้ให้นำมาใช้ต่อ ส่วน <code>pipenv</code> คือเครื่องมือที่สร้างสภาพแวดล้อมเสมือนและจัดการแพ็กเกจของโปรเจกต์ สภาพแวดล้อมเสมือนคือพื้นที่แยกต่างหากสำหรับติดตั้งแพ็กเกจของแต่ละโปรเจกต์ ทำให้เวอร์ชันของแพ็กเกจในโปรเจกต์หนึ่งไม่กระทบอีกโปรเจกต์หนึ่ง</p>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>pip install pipenv</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>pip install</code></td><td>สั่งให้ pip ดาวน์โหลดและติดตั้งแพ็กเกจ</td></tr>
+<tr><td><code>pipenv</code></td><td>ชื่อแพ็กเกจที่ต้องการติดตั้ง</td></tr>
+</tbody></table>
+<p>ติดตั้งครั้งเดียวต่อเครื่อง ไม่ต้องทำซ้ำในแต่ละโปรเจกต์</p>
+<h2>ขั้นตอนที่ 3 สร้างโฟลเดอร์ของโปรเจกต์</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>mkdir django-junraider
+cd django-junraider</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>mkdir django-junraider</code></td><td>สร้างโฟลเดอร์ (Folder) ชื่อ <code>django-junraider</code></td></tr>
+<tr><td><code>cd django-junraider</code></td><td>เปลี่ยนตำแหน่งที่เทอร์มินัลทำงานอยู่ไปยังโฟลเดอร์นั้น คำสั่งในขั้นตอนต่อไปทั้งหมดต้องพิมพ์ในโฟลเดอร์นี้</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 4 ติดตั้ง Django</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>pipenv install "django==4.0.*"</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>pipenv install</code></td><td>สั่งให้ pipenv ติดตั้งแพ็กเกจลงในสภาพแวดล้อมเสมือนของโฟลเดอร์นี้ ถ้ายังไม่มีสภาพแวดล้อมเสมือน pipenv จะสร้างให้เอง</td></tr>
+<tr><td><code>django</code></td><td>ชื่อแพ็กเกจ Django</td></tr>
+<tr><td><code>==4.0.*</code></td><td>กำหนดเวอร์ชัน: ติดตั้งเวอร์ชัน 4.0 รุ่นล่าสุด (4.0.x) เพราะ Django รุ่นใหม่กว่ามีรายละเอียดบางส่วนต่างจาก 4.0 จึงต้องกำหนดเวอร์ชันให้ตรงกับที่บทเรียนนี้ใช้</td></tr>
+<tr><td><code>" "</code></td><td>เครื่องหมายคำพูดครอบข้อความ เพื่อไม่ให้เทอร์มินัลตีความเครื่องหมาย <code>*</code> เป็นอย่างอื่น</td></tr>
+</tbody></table>
+<p>เมื่อติดตั้งเสร็จ จะมีไฟล์ใหม่ 2 ไฟล์ในโฟลเดอร์ คือ <code>Pipfile</code> และ <code>Pipfile.lock</code></p>
+<figure class="code"><figcaption><span>Pipfile (ส่วน [packages])</span></figcaption><pre><code>[packages]
+django = "==4.0.*"</code></pre></figure>
+<ul>
+<li><code>Pipfile</code> เก็บรายชื่อแพ็กเกจที่โปรเจกต์ต้องใช้ พร้อมเงื่อนไขเวอร์ชัน</li>
+<li><code>Pipfile.lock</code> เก็บเวอร์ชันที่ติดตั้งจริงของทุกแพ็กเกจ รวมถึงแพ็กเกจที่ Django เรียกใช้ต่อ เพื่อให้เครื่องอื่นติดตั้งได้เวอร์ชันเดียวกัน</li>
+</ul>
+<h2>ขั้นตอนที่ 5 เข้าสู่สภาพแวดล้อมเสมือน</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>pipenv shell</code></pre></figure>
+<p>คำสั่งนี้เปิดเทอร์มินัลที่ทำงานภายในสภาพแวดล้อมเสมือน สังเกตได้จากชื่อโฟลเดอร์ในวงเล็บหน้าบรรทัดคำสั่ง เช่น <code>(django-junraider)</code> ต้องเข้าสู่สภาพแวดล้อมนี้ทุกครั้งที่เปิดเทอร์มินัลใหม่ก่อนทำงานกับโปรเจกต์ จากนั้นตรวจสอบว่า Django ติดตั้งแล้ว</p>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>django-admin --version</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>django-admin</code></td><td>โปรแกรมคำสั่งของ Django ที่ได้มาพร้อมกับการติดตั้ง ใช้จัดการงานระดับโปรเจกต์ เช่น การสร้างโปรเจกต์</td></tr>
+<tr><td><code>--version</code></td><td>แสดงเวอร์ชันของ Django</td></tr>
+</tbody></table>
+<figure class="code out"><figcaption><span>ผลลัพธ์ที่ควรเห็น (ตัวเลขท้ายอาจต่างกัน แต่ต้องขึ้นต้นด้วย 4.0)</span></figcaption><pre><code>4.0.10</code></pre></figure>
+<h2>ขั้นตอนที่ 6 สร้างโปรเจกต์</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>django-admin startproject project_jrd .</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>django-admin startproject</code></td><td>คำสั่งย่อย <code>startproject</code> สร้างโปรเจกต์ใหม่ ซึ่งคือโฟลเดอร์และไฟล์พื้นฐานที่ Django ต้องใช้</td></tr>
+<tr><td><code>project_jrd</code></td><td>ชื่อโปรเจกต์ ใช้เป็นชื่อโฟลเดอร์ที่เก็บการตั้งค่า ชื่อต้องเป็นตัวอักษรภาษาอังกฤษ ตัวเลข หรือเครื่องหมาย <code>_</code> และไม่ควรซ้ำกับชื่อของ Python หรือ Django เช่น <code>django</code> หรือ <code>test</code></td></tr>
+<tr><td><code>.</code></td><td>จุดหมายถึงโฟลเดอร์ปัจจุบัน ทำให้ไฟล์ <code>manage.py</code> ถูกสร้างในโฟลเดอร์ <code>django-junraider</code> โดยตรง หากไม่ใส่จุด Django จะสร้างโฟลเดอร์ซ้อนเพิ่มอีกชั้น</td></tr>
+</tbody></table>
+<p>เมื่อสำเร็จ จะไม่มีข้อความแสดงในเทอร์มินัล แต่จะมีไฟล์ใหม่ปรากฏในโฟลเดอร์ ดูโครงสร้างไฟล์ท้ายบทนี้</p>
+<h3>หน้าที่ของไฟล์ที่ Django สร้างให้</h3>
+<table class="exp"><thead><tr><th>ไฟล์</th><th>หน้าที่</th></tr></thead><tbody>
+<tr><td><code>manage.py</code></td><td>โปรแกรมคำสั่งประจำโปรเจกต์ ใช้สั่งงาน เช่น เปิดเซิร์ฟเวอร์ ในบทนี้ใช้ผ่านคำสั่ง <code>python manage.py ...</code></td></tr>
+<tr><td><code>project_jrd/__init__.py</code></td><td>ไฟล์ว่างที่บอก Python ว่าโฟลเดอร์ <code>project_jrd</code> เป็นแพ็กเกจของ Python</td></tr>
+<tr><td><code>project_jrd/settings.py</code></td><td>ไฟล์การตั้งค่า (Settings) ของโปรเจกต์ทั้งหมด</td></tr>
+<tr><td><code>project_jrd/urls.py</code></td><td>ไฟล์ประกาศเส้นทาง (URL) ของเว็บไซต์ ใช้ในบทที่ 3</td></tr>
+<tr><td><code>project_jrd/asgi.py และ project_jrd/wsgi.py</code></td><td>จุดเชื่อมต่อให้เว็บเซิร์ฟเวอร์ที่รองรับมาตรฐาน ASGI หรือ WSGI (มาตรฐานการเชื่อมต่อระหว่างเว็บเซิร์ฟเวอร์กับโปรแกรมที่เขียนด้วย Python) เรียกใช้โปรเจกต์ ใช้ตอนนำเว็บขึ้นใช้งานจริงในบทที่ 15</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 7 เปิดเซิร์ฟเวอร์สำหรับพัฒนา</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py runserver</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>python manage.py</code></td><td>เรียก <code>manage.py</code> ด้วย Python เพื่อสั่งงานโปรเจกต์</td></tr>
+<tr><td><code>runserver</code></td><td>คำสั่งเปิดเซิร์ฟเวอร์สำหรับพัฒนา ซึ่งเป็นเว็บเซิร์ฟเวอร์ขนาดเล็กที่ Django มีให้ ใช้ทดลองในเครื่องของตนเองเท่านั้น ไม่ใช้เปิดให้ผู้ใช้จริง</td></tr>
+</tbody></table>
+<figure class="code out"><figcaption><span>ผลลัพธ์ที่ควรเห็นในเทอร์มินัล (วันที่และเวลาจะต่างกัน)</span></figcaption><pre><code>Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 18 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): admin, auth, contenttypes, sessions.
+Run 'python manage.py migrate' to apply them.
+November 05, 2026 - 11:24:43
+Django version 4.0.10, using settings 'project_jrd.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CTRL-BREAK.</code></pre></figure>
+<ul>
+<li>ข้อความ <code>You have 18 unapplied migration(s)</code> เกี่ยวกับการสร้างตารางฐานข้อมูลของ Django ยังไม่ต้องดำเนินการในบทนี้ เนื้อหาเรื่องไมเกรชัน (Migration) อยู่ในบทที่ 7</li>
+<li><code>http://127.0.0.1:8000/</code> คือที่อยู่ของเว็บไซต์ในเครื่องของผู้เรียน โดย <code>127.0.0.1</code> หมายถึงเครื่องของตนเอง และ <code>8000</code> คือหมายเลขพอร์ต (Port) ที่เซิร์ฟเวอร์รับคำขอ</li>
+<li>เทอร์มินัลนี้ต้องเปิดไว้ตลอดขณะใช้งานเว็บ ถ้าต้องพิมพ์คำสั่งอื่นให้เปิดเทอร์มินัลใหม่และทำขั้นตอนที่ 5 อีกครั้ง</li>
+</ul>
+<h2>ขั้นตอนที่ 8 เปิดเว็บในเบราว์เซอร์และหยุดเซิร์ฟเวอร์</h2>
+<p>เปิดเบราว์เซอร์แล้วพิมพ์ที่อยู่ <code>http://127.0.0.1:8000/</code> ในช่องที่อยู่ หน้าเว็บที่แสดงเป็นหน้าต้อนรับของ Django เมื่อต้องการหยุดเซิร์ฟเวอร์ ให้กดปุ่ม Ctrl และ C พร้อมกันในเทอร์มินัลที่รันเซิร์ฟเวอร์ (บน Windows อาจใช้ Ctrl และ Break)</p>
+<h2>ผลลัพธ์ที่ควรได้</h2>
+<ul>
+<li>เบราว์เซอร์แสดงหน้าที่มีข้อความ <code>The install worked successfully! Congratulations!</code> พร้อมภาพจรวด</li>
+<li>มีไฟล์ <code>db.sqlite3</code> เพิ่มในโฟลเดอร์ ซึ่งเป็นไฟล์ฐานข้อมูล SQLite (ระบบฐานข้อมูลที่เก็บข้อมูลทั้งหมดในไฟล์เดียว) ที่ Django สร้างขึ้นเมื่อเริ่มเซิร์ฟเวอร์ (ตั้งค่าไว้ใน <code>DATABASES</code> ของ <code>settings.py</code>) ยังไม่มีตารางใด</li>
+<li>เทอร์มินัลแสดงบรรทัด <code>GET / HTTP/1.1</code> ตามด้วยตัวเลข 200 เมื่อโหลดหน้าเว็บ ซึ่งหมายถึงเซิร์ฟเวอร์ตอบกลับสำเร็จ</li>
+</ul>
+<h2>โครงสร้างไฟล์หลังจบบท</h2>
+<figure class="code"><figcaption><span>django-junraider/</span></figcaption><pre><code>django-junraider/
+├── Pipfile
+├── Pipfile.lock
+├── db.sqlite3
+├── manage.py
+└── project_jrd/
+    ├── __init__.py
+    ├── asgi.py
+    ├── settings.py
+    ├── urls.py
+    └── wsgi.py</code></pre></figure>
+<div class="pager"><a href="index.html">&larr; หน้าแรก</a><a href="ch02.html">บทถัดไป: บทที่ 2 &rarr;</a></div></main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

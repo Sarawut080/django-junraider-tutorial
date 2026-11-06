@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 9 โมเดล วิว และเทมเพลต</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side"><a class="site" href="index.html">สื่อการสอน Django<br>(อ้างอิง django-junraider)</a><ul><li class=""><a href="index.html">หน้าแรก (สารบัญ)</a></li></ul><h4>บทเรียน (Season 1)</h4><ul><li class=""><a href="ch01.html">บทที่ 1 การติดตั้งและเริ่มรันโปรเจกต์ (Setup and Run)</a></li><li class=""><a href="ch02.html">บทที่ 2 โปรเจกต์และแอปพลิเคชัน (Projects x Apps)</a></li><li class=""><a href="ch03.html">บทที่ 3 เส้นทางและวิว (urls x views)</a></li><li class=""><a href="ch04.html">บทที่ 4 วิวและเทมเพลต (views x templates)</a></li><li class=""><a href="ch05.html">บทที่ 5 แท็กในเทมเพลต (templates x tags)</a></li><li class=""><a href="ch06.html">บทที่ 6 ตัวกรองในเทมเพลต (templates x filters)</a></li><li class=""><a href="ch07.html">บทที่ 7 โมเดลและไมเกรชัน (models x migrations)</a></li><li class=""><a href="ch08.html">บทที่ 8 โมเดล (models)</a></li><li class="cur"><a href="ch09.html">บทที่ 9 โมเดล วิว และเทมเพลต</a></li><li class=""><a href="ch10.html">บทที่ 10 แบบฟอร์ม วิว และเทมเพลต (forms)</a></li><li class=""><a href="ch11.html">บทที่ 11 หน้าผู้ดูแลระบบ (admin)</a></li><li class=""><a href="ch12.html">บทที่ 12 ไฟล์ภาพสแตติก (static images)</a></li><li class=""><a href="ch13.html">บทที่ 13 ไฟล์ CSS และ JavaScript สแตติก</a></li><li class=""><a href="ch14.html">บทที่ 14 การตั้งค่าและไฟล์ .env (settings x dotenv)</a></li><li class=""><a href="ch15.html">บทที่ 15 การนำขึ้นใช้งานจริง (Deploy)</a></li></ul><ul><li class=""><a href="credits.html">ที่มา (Credits)</a></li></ul></nav>
+<main>
+<p class="ch">บทที่ 9 จาก 15</p>
+<h1>โมเดล วิว และเทมเพลต</h1>
+<p class="ref">อ้างอิง GitHub: <a href="https://github.com/potchangelo/django-junraider/tree/09-models-views-templates" target="_blank" rel="noopener">บรานช์ 09-models-views-templates</a> · <a href="https://github.com/potchangelo/django-junraider/compare/08-models...09-models-views-templates" target="_blank" rel="noopener">ส่วนที่เปลี่ยนจากบทก่อนหน้า</a></p>
+<h2>วัตถุประสงค์</h2>
+<p>เมื่อจบบทนี้ ผู้เรียนดึงข้อมูลจากฐานข้อมูลในวิวด้วยโมเดล แล้วส่งไปแสดงในเทมเพลต โดยเปลี่ยนหน้ารายการเมนูและหน้ารายละเอียดเมนูให้ใช้ข้อมูลจริงจากตาราง <code>Food</code> และสร้างหน้าลงทะเบียนรับโปรโมชั่นแบบยังไม่บันทึกข้อมูล</p>
+<h2>ขั้นตอนที่ 1 ทำความเข้าใจการดึงข้อมูลในวิว</h2>
+<p>ในบทที่ 5 ข้อมูลเมนูเป็นลิสต์ที่เขียนไว้ในไฟล์ <code>views.py</code> บทนี้เปลี่ยนเป็นดึงจากฐานข้อมูลด้วย <code>Food.objects</code> ที่ใช้ใน Shell ในบทที่ 8 วิวได้ QuerySet แล้วส่งให้เทมเพลตผ่านคอนเท็กซ์ เหมือนที่ส่งลิสต์เดิม เทมเพลตจึงใช้แท็ก <code>for</code> และตัวแปรแบบ <code>food.title</code> ต่อไปได้ แต่ชื่อฟิลด์ต้องเปลี่ยนให้ตรงกับโมเดล เช่น <code>isPremium</code> เป็น <code>is_premium</code></p>
+<p>ก่อนเริ่ม ตรวจว่าตาราง <code>Food</code> มีเมนู 5 รายการจากบทที่ 8</p>
+<h2>ขั้นตอนที่ 2 แก้วิวของ app_foods</h2>
+<p>แทนที่เนื้อหาของ <code>app_foods/views.py</code> ด้วยโค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/09-models-views-templates/app_foods/views.py" target="_blank" rel="noopener">app_foods/views.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.shortcuts import render
+from .models import Food
+
+# Create your views here.
+
+def foods(request):
+    all_foods = Food.objects.order_by('-is_premium')
+    context = {'foods': all_foods}
+    return render(request, 'app_foods/foods.html', context)
+
+
+def food(request, food_id):
+    one_food = None
+    try:
+        one_food = Food.objects.get(id=food_id)
+    except:
+        print('หาไม่เจอ หรือเธอไม่มี')
+    context = {'food': one_food}
+    return render(request, 'app_foods/food.html', context)</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>from .models import Food</code></td><td>นำโมเดล <code>Food</code> จากไฟล์ <code>models.py</code> ในโฟลเดอร์เดียวกันเข้ามา</td></tr>
+<tr><td><code>Food.objects.order_by('-is_premium')</code></td><td>ดึงเมนูทั้งหมดโดยเรียงเมนูพิเศษ (<code>True</code>) ขึ้นก่อน เพราะเรียงจากมากไปน้อย และ <code>True</code> มีค่ามากกว่า <code>False</code></td></tr>
+<tr><td><code>Food.objects.get(id=food_id)</code></td><td>ดึงเมนูที่ <code>id</code> ตรงกับตัวเลขในที่อยู่</td></tr>
+<tr><td><code>except:</code></td><td>รับข้อผิดพลาดทุกชนิด ในที่นี้ใช้รองรับกรณีไม่พบเมนู (<code>Food.DoesNotExist</code> ที่ได้เห็นในบทที่ 8) ตัวแปร <code>one_food</code> จึงยังเป็น <code>None</code></td></tr>
+<tr><td><code>print('หาไม่เจอ หรือเธอไม่มี')</code></td><td>แสดงข้อความในเทอร์มินัลที่รันเซิร์ฟเวอร์</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 3 แก้เทมเพลตรายการเมนู</h2>
+<p>แทนที่เนื้อหาของ <code>foods.html</code> ด้วยโค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/09-models-views-templates/app_foods/templates/app_foods/foods.html" target="_blank" rel="noopener">app_foods/templates/app_foods/foods.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}เมนูอร่อยทั้งหมด - {% endblock %}
+
+{% block content %}
+&lt;h1&gt;เมนูอร่อย ส่งบ่อย ส่งแม่น&lt;/h1&gt;
+{% for food in foods %}
+    &lt;div style="background-color: rgb(255, 238, 231);"&gt;
+        &lt;h3&gt;&lt;a href="{% url 'food' food.id %}"&gt;{{ food.title }}&lt;/a&gt;&lt;/h3&gt;
+        {% if food.special_price is not None %}
+            &lt;p&gt;
+                &lt;del style="color: gray;"&gt;{{ food.price|floatformat:'g' }}&lt;/del&gt;
+                &lt;span&gt;{{ food.special_price|floatformat:'g' }}&lt;/span&gt;
+            &lt;/p&gt;
+        {% else %}
+            &lt;p&gt;{{ food.price|floatformat:'g' }}&lt;/p&gt;
+        {% endif %}
+        {% if food.is_premium %}
+            &lt;p&gt;*** เมนูพิเศษสุด Premium&lt;/p&gt;
+        {% endif %}
+        {% if food.promotion_end_at is not None %}
+            &lt;p&gt;โปรโมชั่นถึงวันที่ {{ food.promotion_end_at|date:'j N Y' }}&lt;/p&gt;
+        {% endif %}
+    &lt;/div&gt;
+{% empty %}
+    &lt;p&gt;วัตถุดิบกำลังเดินทางมาจากทะเลอันไกลโพ้นนนน กรุณารอความอร่อยอีกไม่นาน&lt;/p&gt;
+{% endfor %}
+{% endblock %}</code></pre></figure>
+<h2>ขั้นตอนที่ 4 แก้เทมเพลตรายละเอียดเมนู</h2>
+<p>แทนที่เนื้อหาของ <code>food.html</code> ด้วยโค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/09-models-views-templates/app_foods/templates/app_foods/food.html" target="_blank" rel="noopener">app_foods/templates/app_foods/food.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}{{ food.title }} - {% endblock %}
+
+{% block content %}
+{% if food is not None %}
+    &lt;h1&gt;{{ food.title }}&lt;/h1&gt;
+    {% if food.special_price is not None %}
+        &lt;p&gt;
+            &lt;del style="color: gray;"&gt;{{ food.price|floatformat:'g' }}&lt;/del&gt;
+            &lt;span&gt;{{ food.special_price|floatformat:'g' }}&lt;/span&gt;
+        &lt;/p&gt;
+    {% else %}
+        &lt;p&gt;{{ food.price|floatformat:'g' }}&lt;/p&gt;
+    {% endif %}
+    {% if food.is_premium %}
+        &lt;p&gt;*** เมนูพิเศษสุด Premium&lt;/p&gt;
+    {% endif %}
+    {% if food.promotion_end_at is not None %}
+        &lt;p&gt;โปรโมชั่นถึงวันที่ {{ food.promotion_end_at|date:'j N Y' }}&lt;/p&gt;
+    {% endif %}
+    &lt;p&gt;{{ food.description }}&lt;/p&gt;
+{% else %}
+    &lt;p&gt;ไม่พบเมนู&lt;/p&gt;
+{% endif %}
+{% endblock %}</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>{% if food.special_price is not None %}</code></td><td>ถ้าเมนูมีราคาพิเศษ ให้แสดงราคาเดิมด้วยแท็ก HTML <code>&lt;del&gt;</code> ซึ่งขีดฆ่าข้อความ และแสดงราคาพิเศษข้างกัน ถ้าไม่มีให้แสดงราคาปกติ (<code>{% else %}</code>)</td></tr>
+<tr><td><code>{% if food.is_premium %}</code></td><td>แสดงข้อความเมนูพิเศษเมื่อฟิลด์ <code>is_premium</code> เป็น <code>True</code></td></tr>
+<tr><td><code>{% if food.promotion_end_at is not None %}</code></td><td>แสดงวันสิ้นสุดโปรโมชั่นเฉพาะเมนูที่มีค่านี้ เพราะฟิลด์อนุญาตให้ไม่มีค่า</td></tr>
+<tr><td><code>{{ food.description }}</code></td><td>แสดงคำอธิบายเมนูจากฐานข้อมูลแทนข้อความเดิมที่กำหนดไว้ในไฟล์</td></tr>
+</tbody></table>
+<p>เทมเพลต <code>foods.html</code> ใช้โครงเดียวกัน เพียงวนซ้ำด้วย <code>{% for food in foods %}</code></p>
+<h2>ขั้นตอนที่ 5 เพิ่มเส้นทางและวิวของหน้าลงทะเบียน</h2>
+<p>แทนที่เนื้อหาของ <code>app_general/urls.py</code> และ <code>app_general/views.py</code> ด้วยโค้ดนี้</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/09-models-views-templates/app_general/urls.py" target="_blank" rel="noopener">app_general/urls.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.home, name='home'),
+    path('about', views.about, name='about'),
+    path('subscription', views.subscription, name='subscription'),
+    path('subscription/thankyou', views.subscription_thankyou, name='subscription_thankyou'),
+]</code></pre></figure>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/09-models-views-templates/app_general/views.py" target="_blank" rel="noopener">app_general/views.py</a></span><button type="button">คัดลอก</button></figcaption><pre><code>from django.shortcuts import render
+from app_foods.models import Food
+
+# Create your views here.
+
+def home(request):
+    return render(request, 'app_general/home.html')
+
+def about(request):
+    return render(request, 'app_general/about.html')
+
+def subscription(request):
+    all_foods = Food.objects.order_by('-is_premium')
+    context = {'foods': all_foods}
+    return render(request, 'app_general/subscription_form.html', context)
+
+def subscription_thankyou(request):
+    return render(request, 'app_general/subscription_thankyou.html')</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>path('subscription', views.subscription, name='subscription')</code></td><td>เส้นทางหน้าฟอร์มลงทะเบียน</td></tr>
+<tr><td><code>path('subscription/thankyou', ...)</code></td><td>เส้นทางหน้าขอบคุณ ที่อยู่มีเครื่องหมาย <code>/</code> คั่นได้</td></tr>
+<tr><td><code>from app_foods.models import Food</code></td><td>วิวของ <code>app_general</code> นำโมเดลของอีกแอปเข้ามาใช้ได้ เพราะทุกแอปอยู่ในโปรเจกต์เดียวกัน</td></tr>
+<tr><td><code>def subscription(request):</code></td><td>ดึงเมนูทั้งหมดส่งให้เทมเพลต เพื่อสร้างตัวเลือกเมนูที่สนใจ</td></tr>
+<tr><td><code>def subscription_thankyou(request):</code></td><td>แสดงหน้าขอบคุณ</td></tr>
+</tbody></table>
+<h2>ขั้นตอนที่ 6 สร้างเทมเพลตหน้าลงทะเบียนและหน้าขอบคุณ</h2>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/09-models-views-templates/app_general/templates/app_general/subscription_form.html" target="_blank" rel="noopener">app_general/templates/app_general/subscription_form.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}ลงทะเบียนรับโปรโมชั่น - {% endblock %}
+
+{% block content %}
+&lt;h1&gt;ลงทะเบียนรับโปรโมชั่น&lt;/h1&gt;
+&lt;form&gt;
+    &lt;div&gt;
+        &lt;label&gt;ชื่อ-นามสกุล&lt;/label&gt;
+        &lt;input type="text"&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label&gt;อีเมล&lt;/label&gt;
+        &lt;input type="email"&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label&gt;เมนูที่สนใจ&lt;/label&gt;
+        {% for food in foods %}
+            &lt;label&gt;
+                &lt;input type="checkbox"&gt; {{ food.title }}
+            &lt;/label&gt;
+        {% endfor %}
+    &lt;/div&gt;
+    &lt;a href="{% url 'subscription_thankyou' %}"&gt;ลงทะเบียนรับโปรโมชั่น&lt;/a&gt;
+&lt;/form&gt;
+{% endblock %}</code></pre></figure>
+<table class="exp"><thead><tr><th>โค้ด / คำสั่ง</th><th>คำอธิบาย</th></tr></thead><tbody>
+<tr><td><code>&lt;form&gt; ... &lt;/form&gt;</code></td><td>แท็ก HTML สำหรับแบบฟอร์ม (Form) ที่รวมช่องกรอกข้อมูล</td></tr>
+<tr><td><code>&lt;label&gt;</code></td><td>ป้ายข้อความของช่องกรอก</td></tr>
+<tr><td><code>&lt;input type="text"&gt;</code></td><td>ช่องกรอกข้อความ</td></tr>
+<tr><td><code>&lt;input type="email"&gt;</code></td><td>ช่องกรอกอีเมล เบราว์เซอร์ตรวจรูปแบบอีเมลเบื้องต้นให้</td></tr>
+<tr><td><code>&lt;input type="checkbox"&gt;</code></td><td>เช็กบอกซ์ (Checkbox) สำหรับเลือกรายการ</td></tr>
+<tr><td><code>{% for food in foods %} ... {% endfor %}</code></td><td>สร้างเช็กบอกซ์หนึ่งช่องต่อเมนูหนึ่งรายการ</td></tr>
+<tr><td><code>&lt;a href="{% url 'subscription_thankyou' %}"&gt;</code></td><td>ปุ่มนี้เป็นลิงก์ไปหน้าขอบคุณเท่านั้น ยังไม่ส่งและบันทึกข้อมูลใด ๆ บทที่ 10 จะแก้ให้ทำงานจริง</td></tr>
+</tbody></table>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/09-models-views-templates/app_general/templates/app_general/subscription_thankyou.html" target="_blank" rel="noopener">app_general/templates/app_general/subscription_thankyou.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}ขอบคุณสำหรับการลงทะเบียน - {% endblock %}
+
+{% block content %}
+&lt;h1&gt;ขอบคุณสำหรับการลงทะเบียน&lt;/h1&gt;
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc luctus finibus augue, et ornare tellus lacinia id. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.&lt;/p&gt;
+&lt;a href="{% url 'home' %}"&gt;กลับหน้าแรก&lt;/a&gt;
+{% endblock %}</code></pre></figure>
+<h2>ขั้นตอนที่ 7 แก้ข้อความของหน้าอื่น</h2>
+<p>บทนี้แก้ข้อความของส่วนหัว หน้าแรก และหน้าเกี่ยวกับ โดยโครงของเทมเพลตไม่เปลี่ยน แทนที่เนื้อหาทั้งไฟล์ของไฟล์ทั้งสามด้วยโค้ดต่อไปนี้ (ข้อความ Lorem ipsum คือข้อความตัวอย่างภาษาละติน ใช้แทนเนื้อหาจริง)</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/09-models-views-templates/app_general/templates/app_general/components/site_header.html" target="_blank" rel="noopener">app_general/templates/app_general/components/site_header.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>&lt;header class="site-header" style="background-color: lightgray;"&gt;
+    &lt;a class="site-header-item site-header-brand" href="{% url 'home' %}"&gt;จันทร์ไรเดอร์&lt;/a&gt;
+    &lt;a class="site-header-item" href="{% url 'foods' %}"&gt;เมนูทั้งหมด&lt;/a&gt;
+    &lt;a class="site-header-item" href="{% url 'about' %}"&gt;เกี่ยวกับ&lt;/a&gt;
+&lt;/header&gt;</code></pre></figure>
+<p>ส่วนที่เปลี่ยนคือข้อความลิงก์ที่สอง จาก เมนูอร่อยทั้งหมด เป็น เมนูทั้งหมด</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/09-models-views-templates/app_general/templates/app_general/home.html" target="_blank" rel="noopener">app_general/templates/app_general/home.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block content %}
+&lt;h1&gt;จันทร์ไรเดอร์&lt;/h1&gt;
+&lt;p&gt;ไอศครีมอร่อย ส่งบ่อย ส่งแม่น&lt;/p&gt;
+&lt;p&gt;จัดส่งไอศครีมรสโปรดของคุณ ทุกวันจันทร์แรก จันทร์ที่สอง หรือจันทร์ที่สาม ของแต่ละเดือน&lt;/p&gt;
+{% endblock %}</code></pre></figure>
+<p>ส่วนที่เปลี่ยนคือข้อความในแท็ก <code>&lt;p&gt;</code> ทั้งสองย่อหน้า</p>
+<figure class="code"><figcaption><span><a href="https://github.com/potchangelo/django-junraider/blob/09-models-views-templates/app_general/templates/app_general/about.html" target="_blank" rel="noopener">app_general/templates/app_general/about.html</a></span><button type="button">คัดลอก</button></figcaption><pre><code>{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}เกี่ยวกับหมู่เฮา - {% endblock %}
+
+{% block content %}
+&lt;h1&gt;เกี่ยวกับจันทร์ไรเดอร์&lt;/h1&gt;
+&lt;h4&gt;ก่อตั้ง 2021&lt;/h4&gt;
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc luctus finibus augue, et ornare tellus lacinia id. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras vehicula erat ac neque efficitur, eget rutrum turpis vulputate. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec pulvinar vel nibh ac bibendum.&lt;/p&gt;
+&lt;h4&gt;วัตถุดิบชั้นยอด&lt;/h4&gt;
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc luctus finibus augue, et ornare tellus lacinia id. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras vehicula erat ac neque efficitur, eget rutrum turpis vulputate. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec pulvinar vel nibh ac bibendum.&lt;/p&gt;
+&lt;h4&gt;สุดยอดจันทร์ไรแมน&lt;/h4&gt;
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc luctus finibus augue, et ornare tellus lacinia id. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras vehicula erat ac neque efficitur, eget rutrum turpis vulputate. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec pulvinar vel nibh ac bibendum.&lt;/p&gt;
+{% endblock %}</code></pre></figure>
+<p>ส่วนที่เปลี่ยนคือหัวข้อ <code>&lt;h1&gt;</code> และเนื้อหาในบล็อก <code>content</code> ซึ่งเปลี่ยนเป็นหัวข้อย่อย 3 หัวข้อพร้อมข้อความ Lorem ipsum และไม่มีเส้นแบ่ง <code>&lt;hr&gt;</code> แล้ว</p>
+<h2>ขั้นตอนที่ 8 เปิดเซิร์ฟเวอร์และทดสอบ</h2>
+<figure class="code"><figcaption><span>Terminal</span><button type="button">คัดลอก</button></figcaption><pre><code>python manage.py runserver</code></pre></figure>
+<h2>ผลลัพธ์ที่ควรได้</h2>
+<table class="exp"><thead><tr><th>ที่อยู่</th><th>ผลที่เห็น</th></tr></thead><tbody>
+<tr><td><code>http://127.0.0.1:8000/foods/</code></td><td>แสดงเมนู 5 รายการ เมนูพิเศษ (Dark Choco Premium, White Choco Premium) อยู่ก่อน ตามด้วย Red Spicy, Blue Glacier, Yellow Sunrise (ลำดับภายในแต่ละกลุ่มอาจต่างจากนี้ เพราะเรียงตาม <code>is_premium</code> อย่างเดียว) เมนู Yellow Sunrise แสดงราคาเดิม 2,990 ขีดฆ่าและราคาพิเศษ 2,490 พร้อมวันสิ้นสุดโปรโมชั่นซึ่งคือ 30 วันนับจากวันที่ทำบทที่ 8</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/1</code></td><td>แสดงชื่อ Red Spicy ราคา 2,990 และคำอธิบาย เผ็ดจัดจ้านด้วยพริกสามสี</td></tr>
+<tr><td><code>http://127.0.0.1:8000/foods/99</code></td><td>แสดงข้อความ ไม่พบเมนู และเทอร์มินัลแสดง หาไม่เจอ หรือเธอไม่มี</td></tr>
+<tr><td><code>http://127.0.0.1:8000/subscription</code></td><td>แสดงฟอร์มที่มีช่องชื่อ อีเมล และเช็กบอกซ์เมนู 5 รายการ</td></tr>
+<tr><td><code>http://127.0.0.1:8000/subscription/thankyou</code></td><td>แสดงหน้า ขอบคุณสำหรับการลงทะเบียน</td></tr>
+<tr><td><code>http://127.0.0.1:8000/ และ /about</code></td><td>ข้อความตามไฟล์ที่แก้ ลิงก์ในส่วนหัวเป็น เมนูทั้งหมด</td></tr>
+</tbody></table>
+<h2>โครงสร้างไฟล์หลังจบบท</h2>
+<p>แสดงเฉพาะไฟล์ที่เพิ่มหรือแก้ในบทนี้ (+ คือไฟล์ที่สร้างใหม่, * คือไฟล์ที่แก้ไข)</p>
+<figure class="code"><figcaption><span>django-junraider/</span></figcaption><pre><code>django-junraider/
+├── app_foods/
+│   ├── templates/app_foods/
+│   │   ├── food.html                        *
+│   │   └── foods.html                       *
+│   └── views.py                             *
+└── app_general/
+    ├── templates/app_general/
+    │   ├── about.html                       *
+    │   ├── home.html                        *
+    │   ├── subscription_form.html           +
+    │   ├── subscription_thankyou.html       +
+    │   └── components/
+    │       └── site_header.html             *
+    ├── urls.py                              *
+    └── views.py                             *</code></pre></figure>
+<div class="pager"><a href="ch08.html">&larr; บทก่อนหน้า: บทที่ 8</a><a href="ch10.html">บทถัดไป: บทที่ 10 &rarr;</a></div></main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
